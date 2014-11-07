@@ -51,7 +51,6 @@ def add_addresses_to_mailchimp_list(addresses, api_key, data_center, list_id, up
 							})
 
 def ping_mailchimp():
-
 	return _query_mailchimp(config.DATA_CENTER, 
 							"helper", "ping", 
 							{"apikey": config.API_KEY, 
