@@ -15,12 +15,12 @@ class TestGetParamsHelper(TestCase):
                 }
             }}, "app.mailchimp.api_key"), tuple(['ABCDE']))
 
-        # self.assertEquals(get_params({"app" : {
-        #         "mailchimp": {"api_key": "ABS"},
-        #         "twitter": {"a" : "b", "b" : "c"}
-        #         }
-        #     }, "app.mailchimp.api_key", "twitter"),
-        #     ("ABS", {"a": "b", "b": "c"}))
+        self.assertEquals(get_params({"app" : {
+                "mailchimp": {"api_key": "ABS"},
+                "twitter": {"a" : "b", "b" : "c"}
+                }
+            }, "app.mailchimp.api_key", "app.twitter"),
+            ("ABS", {"a": "b", "b": "c"}))
 
     # def test_fails_properly(self):
     #     self.assertRaises(MisConfiguredError, get_params, {"app": {
