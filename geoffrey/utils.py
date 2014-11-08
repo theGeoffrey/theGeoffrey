@@ -10,19 +10,29 @@ def get_params(config, *args, **kwargs):
     pprint("args: {}".format(args))
     pprint("kwargs: {}".format(kwargs))
 
-    results = []
+    list_results = []
+    dict_result = {}
 
-    for arg in args:
-        arg_list = arg.split('.')
-        pprint("argsss: {}".format(arg_list))
-
+    def get_value_for_key(key):
+        arg_list = key.split('.')
         dict_value = config
         while len(arg_list) > 0:
-            pprint("ARG_LIST:{}, for count:{}".format(arg_list, len(arg_list)))
-            dict_value = dict_value[arg_list.pop(0)]
-            pprint("DICTVAL {}".format(dict_value))
+            if arg_list[0] in dict_value:
+                dict_value = dict_value[arg_list.pop(0)]
+            else:
+                raise MisConfiguredError(
+                    "key {} not found".format(arg_list[0]))
+        return dict_value
 
-        results.append(dict_value)
-        pprint(tuple(results))
+    for arg in args:
+        list_results.append(get_value_for_key(arg))
 
-    return tuple(results)
+    for key, value in kwargs.iteritems():
+        dict_result[key] = get_value_for_key(value)
+
+    if len(list_results) > 0 and len(dict_result.keys()) > 0:
+        return tuple((list_results, dict_result))
+    elif len(dict_result.keys()) > 0:
+        return dict_result
+    else:
+        return tuple(list_results)
