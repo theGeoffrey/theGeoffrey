@@ -1,5 +1,5 @@
-import mailchimp
-import config
+from geoffrey.services import mailchimp
+from geoffrey import config
 from twisted.internet import reactor
 from twisted.internet import defer
 from twisted.python import log

@@ -1,8 +1,9 @@
 from celery import Celery
 from txcelery.defer import CeleryClient
 from twisted.internet import defer
-import config
-import mailchimp
+
+from geoffrey import config
+from geoffrey.services import mailchimp
 
 app = Celery('tasks', broker=config.BROKER_URL)
 
