@@ -6,10 +6,6 @@ class MisConfiguredError(Exception):
 
 
 def get_params(config, *args, **kwargs):
-    pprint("config {}".format(config))
-    pprint("args: {}".format(args))
-    pprint("kwargs: {}".format(kwargs))
-
     list_results = []
     dict_result = {}
 

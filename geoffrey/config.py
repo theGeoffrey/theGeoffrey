@@ -1,8 +1,13 @@
-API_KEY = "4f34ea944dd1e33a5452550789042f9c-us9"
-DATA_CENTER = "us9"
-TEST_LIST_ID = "f4b255a33a".encode("utf-8")
+from geoffrey.utils import get_params
 
-BROKER_URL = "sqla+sqlite:///celerydb.sqlite"
+import yaml
 
-API_SERVER_HOST = "localhost"
-API_SERVER_PORT = 8081
+
+class Config(dict):
+
+    def __getattr__(self, attr):
+        return get_params(self, attr)[0]
+
+
+with open("config.yml", "r") as reader:
+    CONFIG = Config(**yaml.load(reader.read()))

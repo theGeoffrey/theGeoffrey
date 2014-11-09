@@ -1,7 +1,7 @@
 from werkzeug.exceptions import Unauthorized
 from klein import Klein
 from geoffrey import __version__
-from geoffrey import config
+from geoffrey.config import CONFIG
 
 
 class GeoffreyApi(Klein):
@@ -15,9 +15,9 @@ class GeoffreyApi(Klein):
         config
         """
         api_key = request.args.get("key", [None])[0]
-        if not api_key or config.API_KEY != api_key:
+        if not api_key or CONFIG.API_KEY != api_key:
             raise Unauthorized()
-        return config
+        return CONFIG
 
 app = GeoffreyApi()
 
