@@ -1,4 +1,5 @@
 from werkzeug.exceptions import Unauthorized
+from twisted.internet import defer
 from klein import Klein
 from geoffrey import __version__
 from geoffrey.config import CONFIG
@@ -17,15 +18,20 @@ class GeoffreyApi(Klein):
         api_key = request.args.get("key", [None])[0]
         if not api_key or CONFIG.API_KEY != api_key:
             raise Unauthorized()
-        return CONFIG
+        request.config = CONFIG
+        return defer.succeed(request)
+
+    def secure(self, func):
+        def secured(request):
+            return self._get_config(request).addCallback(func)
+        return secured
 
 app = GeoffreyApi()
 
-
 @app.route('/ping')
+@app.secure
 def ping(request):
-    config = app._get_config(request)
-    return 'Your API key is:{}'.format(config.API_KEY)
+    return 'Your API key is:{}'.format(request.config.API_KEY)
 
 
 @app.route('/version')
