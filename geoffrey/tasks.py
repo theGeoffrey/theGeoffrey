@@ -5,12 +5,19 @@ from twisted.internet import defer
 from geoffrey import config
 from geoffrey.services import mailchimp
 
-app = Celery('tasks', broker=config.BROKER_URL)
+app = Celery('tasks', broker=config.CONFIG.BROKER_URL)
+
 
 @CeleryClient
 @app.task
-def add(app_config, payload):
-	return mailchimp.add
+def mailchimp_subscribe(app_config, payload):
+    return mailchimp.add
 
-#app_config: api_key, dc, list_id
-#payload: 
+
+@CeleryClient
+@app.task
+def mailchimp_batch_subscribe(app_config, payload):
+    return mailchimp.add
+
+mailchimp_subscribe.reacts_on_api_calls = ["add_user"]
+mailchimp_batch_subscribe.reacts_on_api_calls = ["add_batch"]
