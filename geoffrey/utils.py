@@ -31,15 +31,18 @@ def get_params(config, *args, **kwargs):
     elif len(dict_result.keys()) > 0:
         return dict_result
     else:
-        return tuple(list_results)
- 
+        if len(list_results) > 1:
+            return list_results
+        else:
+            return list_results[0]
+
 
 def get_active_services_for_api(config, api_call, module):
+    services = get_params(config, 'enabled_services')
 
-    for service in get_params(config, 'enabled_services')[0]:
+    for service in services:
 
         func = getattr(module, service)
 
         if api_call in func.reacts_on_api_calls:
             yield func
-
