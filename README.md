@@ -20,4 +20,4 @@ Start the API Server via:
 
 Start the Backend Workers with Celery
 
-   TO BE ADDED
+   celery -A tasks worker --loglevel=info
