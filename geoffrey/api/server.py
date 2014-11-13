@@ -3,6 +3,8 @@ from twisted.internet import defer
 from klein import Klein
 from geoffrey import __version__
 from geoffrey.config import CONFIG
+from geoffrey.utils import get_active_services_for_api
+from geoffrey import tasks
 import json
 
 class GeoffreyApi(Klein):
@@ -33,8 +35,14 @@ app = GeoffreyApi()
 @app.route('/users/add', methods=["POST"])
 @app.secure
 def add_user(request):
+
     payload = json.loads(request.content.read())
-    return "Received User ID: {}".format(payload['user_id'])
+
+    for func in get_active_services_for_api(request.config, 'add_user', tasks):
+        func.delay(request.config, payload)
+
+    return '{"succeed": true}'
+    # return "payload {} and config: {}".format(payload, request.config)
 
 
 @app.route('/ping')
