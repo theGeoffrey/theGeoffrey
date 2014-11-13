@@ -56,6 +56,20 @@ def add_addresses_to_mailchimp_list(addresses, api_key, data_center, list_id,
                              })
 
 
+def add_single_user_to_mailchimp_list(email, api_key, data_center, list_id,
+                                      update=True, double_optin=False,
+                                      replace_interests=True):
+    return _query_mailchimp(data_center,
+                            "lists", "subscribe",
+                            {"apikey": api_key,
+                             "id": list_id,
+                             "email": {"email": email},
+                             "update_existing": update,
+                             "double_optin": double_optin,
+                             "replace_interests": replace_interests
+                             })
+
+
 def ping_mailchimp():
     return _query_mailchimp(config.DATA_CENTER,
                             "helper", "ping",
