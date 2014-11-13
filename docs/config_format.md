@@ -28,12 +28,15 @@ Allowing for easy traver
 
 # NEW-USER-PUSH:
 
-PAYLOAD = {
-    "user_id": 123,
+
+example for post request test mailchimp:
+
+
+{"CONFIG": {"api_key":"yay", 
+             "apps: {"mailchimp": {"api_key": "4f34ea944dd1e33a5452550789042f9c-us9", 
+                                   "data_center": "us9", 
+                                   "list_id": "f4b255a33a"}}}}
+
+{"PAYLOAD" : {
     "email": "1234@gmail.com",
-}
-
-
-for x in NEW_USER_PUSH_SERVICES:
-    if x in config["enabled_services"]:
-        tasks[x].delay(config, payload)
+}}
