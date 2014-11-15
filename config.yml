@@ -12,3 +12,12 @@ apps:
     DATA_CENTER: "us9"
     TEST_LIST_ID: "f4b255a33a"
 
+#adding this so tests can run using geoffrey/tasks
+CELERY:
+  BROKER_URL: redis://localhost:6379/0
+  CELERY_RESULT_BACKEND: redis://localhost:6379/1
+  CELERY_TASK_SERIALIZER: json
+  CELERY_ACCEPT_CONTENT:
+    - json
+
+  CELERY_RESULT_SERIALIZER: json

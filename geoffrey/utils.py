@@ -5,9 +5,11 @@ class MisConfiguredError(Exception):
     pass
 
 
+class ProgrammingError(MisConfiguredError):
+    pass
+
+
 def get_params(config, *args, **kwargs):
-    list_results = []
-    dict_result = {}
 
     def get_value_for_key(key):
         arg_list = key.split('.')
@@ -20,21 +22,28 @@ def get_params(config, *args, **kwargs):
                     "key {} not found".format(arg_list[0]))
         return dict_value
 
-    for arg in args:
-        list_results.append(get_value_for_key(arg))
+    if args and kwargs:
+        raise ProgrammingError("get params for args OR kwargs")
+        pass
 
-    for key, value in kwargs.iteritems():
-        dict_result[key] = get_value_for_key(value)
+    elif args:
+        list_results = []
+        for arg in args:
+            list_results.append(get_value_for_key(arg))
 
-    if len(list_results) > 0 and len(dict_result.keys()) > 0:
-        return tuple((list_results, dict_result))
-    elif len(dict_result.keys()) > 0:
-        return dict_result
-    else:
         if len(list_results) > 1:
             return list_results
         else:
             return list_results[0]
+
+    elif kwargs:
+        dict_result = {}
+        for key, value in kwargs.iteritems():
+            dict_result[key] = get_value_for_key(value)
+        return dict_result
+
+    else:
+        pass
 
 
 def get_active_services_for_api(config, api_call, module):
