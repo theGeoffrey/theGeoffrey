@@ -43,7 +43,7 @@ def get_params(config, *args, **kwargs):
         return dict_result
 
     else:
-        pass
+        return "NO DATA"
 
 
 def get_active_services_for_api(config, api_call, module):
