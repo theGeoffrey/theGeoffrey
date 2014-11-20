@@ -26,18 +26,3 @@ template = u'''
    {{/message}}
 '''
 
-context = {
-    'information': {
-        'email': 'bob@online.com',
-        'fname': 'Angry',
-        'lname': 'Bob'
-    },
-    'message': {
-        'body': "I'm angry Bob and i'm angryyyyyyyy."
-    },
-    'title': 'BOBBBBB'
-}
-
-if __name__ == "__main__":
-    print render(template, context)
-
