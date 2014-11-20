@@ -12,4 +12,6 @@ single e-mail address:
         "email": "example email"
     }
 
+ --> See also test_email_batch_generator
+
  
