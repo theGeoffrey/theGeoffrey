@@ -13,12 +13,12 @@ module.exports = {
   output: {
     publicPath: '/assets/',
     path: 'dist/assets/',
-    filename: 'main.js'
+    filename: 'app.js'
   },
 
   debug: false,
   devtool: false,
-  entry: './src/scripts/components/GeoffreyUiApp.jsx',
+  entry: './src/scripts/components/Main.jsx',
 
   stats: {
     colors: true,
