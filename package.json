@@ -14,7 +14,9 @@
     "backbone-model": "^1.0.6",
     "backbone-react-component": "^0.7.2",
     "backbone-router": "0.0.0",
+    "flux": "^2.0.1",
     "jquery": "^2.1.1",
+    "object-assign": "^1.0.0",
     "react": "~0.11.2"
   },
   "devDependencies": {

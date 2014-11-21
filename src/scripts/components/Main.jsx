@@ -6,7 +6,7 @@
 
 var React = require('react/addons'),
     LogoComponent = require('./Logo'),
-    SiteModel = require('../models/Site');
+    site = require('../stores/Site');
 
 
 // Export React so the devtools can find it
@@ -16,26 +16,19 @@ var React = require('react/addons'),
 require('../../styles/normalize.css');
 require('../../styles/main.css');
 
-var imageURL = require('../../images/yeoman.png'),
-    model = new SiteModel({});
-
-console.log(model);
+var imageURL = require('../../images/yeoman.png');
+console.log(site);
 
 var Main = React.createClass({
   render: function() {
     return (
       <div className='main'>
-        <LogoComponent model={model} />
+        <LogoComponent />
       </div>
     );
   }
 });
 
 React.renderComponent(<Main />, document.getElementById('content')); // jshint ignore:line
-
-setTimeout(function(){
-    model.set('logo', imageURL);
-    console.log('after');
-})
-
+site.set('logo', imageURL)
 module.exports = Main;
