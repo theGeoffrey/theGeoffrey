@@ -76,7 +76,17 @@ def add_user(request):
         func.delay(request.config, payload)
 
     return '{"succeed": true}'
-    # return "payload {} and config: {}".format(payload, request.config)
+
+
+@app.route('/forms/add', methods=['POST'])
+@app.public
+def add_form(request):
+    payload = json.loads(request.content.read())
+
+    for func in get_active_services_for_api(request.config, 'add_form', tasks):
+        func.delay(request.config, payload)
+
+    return '{"succeed": true}'
 
 
 @app.route('/ping')
