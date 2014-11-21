@@ -1,19 +1,19 @@
 
-var updateConfig = require('../../actions/appConfig').updateConfig,
+var updateConfig = require('../../actions/Config').updateConfig,
     _ = require('underscore'),
-    appConfig = require('../../stores/App');
+    CONFIG = require('../../stores/Config');
 
 module.exports = {
     componentDidMount: function() {
-        appConfig.on('all', this._onChange);
+        CONFIG.on('all', this._onChange);
     },
     getInitialState: function() {
         return this._get_config();
     },
     _get_config: function(inp){
-        var cfg = _.extend(inp || {}, appConfig.attributes[this._key]);
+        var cfg = _.extend(inp || {}, CONFIG.attributes[this._key]);
         if (this._services && this._services.length){
-            var active_services = appConfig.attributes['services'] || [];
+            var active_services = CONFIG.attributes['services'] || [];
             _.each(this._services, function(service){
                 cfg[service] = _.contains(active_services, service);
             });
@@ -25,19 +25,19 @@ module.exports = {
     },
     _defaultFormSubmit: function(evt){
         var payload = {},
-            active_services = (appConfig.attributes || {})['services'] || [];
+            active_services = (CONFIG.attributes || {})['services'] || [];
             my_services = this._get_service_definition();
 
         // load in defaults
         payload[this._key] = this._get_form_data();
-        console.log(my_services);
+
         if (my_services){
             payload['services'] = _.union(
                 _.reject(active_services, function(s){
                     return _.contains(my_services[1], s);
                 }), my_services[0]);
         }
-        console.log(payload);
+
         updateConfig(payload);
         return false;
     },
@@ -62,7 +62,6 @@ module.exports = {
             remove = []
             refs = this.refs;
         _.each(services, function(service){
-            console.log(refs[service].getDOMNode().value);
             if (refs[service].getDOMNode().value === "on"){
                 add.push(service);
             } else {

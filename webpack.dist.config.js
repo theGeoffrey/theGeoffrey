@@ -18,7 +18,11 @@ module.exports = {
 
   debug: false,
   devtool: false,
-  entry: './src/scripts/components/App.jsx',
+  entry: [
+    '!bootstrap-webpack!./bootstrap.config.js',
+    'font-awesome-webpack!./font-awesome.config.js',
+    './src/scripts/components/Main.jsx'
+  ],
 
   stats: {
     colors: true,

@@ -22,7 +22,7 @@ module.exports = {
       'webpack/hot/only-dev-server',
       '!bootstrap-webpack!./bootstrap.config.js',
       'font-awesome-webpack!./font-awesome.config.js',
-      './src/scripts/components/App.jsx'
+      './src/scripts/components/Main.jsx'
   ],
 
   stats: {

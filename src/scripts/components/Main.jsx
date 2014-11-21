@@ -6,11 +6,10 @@
 
 var React = require('react/addons'),
     Router = require('./Router'),
-    AppDispatcher = require('../dispatchers/App'),
+    MainDispatcher = require('../dispatchers/Main'),
     Button = require('react-bootstrap').Button,
     ButtonToolbar = require('react-bootstrap').ButtonToolbar,
-    AppConfig = require('./AppConfig');
-
+    MainConfig = require('./MainConfig');
 
 // Export React so the devtools can find it
 (window !== window.top ? window.top : window).React = React;
@@ -20,9 +19,9 @@ require('../../styles/main.css');
 
 var imageURL = require('../../images/yeoman.png');
 
-var App = React.createClass({
+var MainApp = React.createClass({
   componentDidMount: function(){
-    AppDispatcher.dispatch({actionType: 'initApp'});
+    MainDispatcher.dispatch({actionType: 'initMain'});
   },
   render: function() {
     return (
@@ -36,12 +35,12 @@ var App = React.createClass({
             <Button bsStyle="danger"><i className="fa fa-error"></i>Danger</Button>
             <Button bsStyle="link"><i className="fa fa-link"></i>Link</Button>
         </ButtonToolbar>
-        <AppConfig />
+        <MainConfig />
         <Router />
       </div>
     );
   }
 });
 
-React.render(<App />, document.getElementById('content')); // jshint ignore:line
-module.exports = App;
+React.render(<MainApp />, document.getElementById('content')); // jshint ignore:line
+module.exports = MainApp;

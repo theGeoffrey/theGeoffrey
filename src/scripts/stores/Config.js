@@ -1,6 +1,6 @@
 var Model = require('backbone-model').Model,
-    AppDispatcher = require('../dispatchers/App'),
-    AppConfigModel = Model.extend({
+    MainDispatcher = require('../dispatchers/Main'),
+    ConfigModel = Model.extend({
         // let's be a dummy
         sync: function(method, model, options){
             switch(method){
@@ -24,19 +24,19 @@ var Model = require('backbone-model').Model,
         }
     });
 
-var appConfig = new AppConfigModel({});
+var config = new ConfigModel({});
 
-AppDispatcher.register(function(evt) {
+MainDispatcher.register(function(evt) {
     switch(evt.actionType){
         case 'updateConfig':
-            return appConfig.save(evt.payload,
+            return config.save(evt.payload,
                 {patch: true});
-        case 'initApp':
-            return appConfig.fetch()
+        case 'initMain':
+            return config.fetch()
         default:
             break;
     }
     return true;
 });
 
-module.exports = appConfig;
+module.exports = config;

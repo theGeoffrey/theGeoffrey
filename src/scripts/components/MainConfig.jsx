@@ -5,18 +5,18 @@
 var React = require('react/addons'),
     ReactBackboneMixin = require('backbone-react-component'),
     ReactTransitionGroup = React.addons.TransitionGroup,
-    App = require('../stores/App');
+    Config = require('../stores/Config');
 
 
 module.exports = React.createClass({
     componentDidMount: function() {
-        App.on('all sync', this._onChange);
+        Config.on('all sync', this._onChange);
     },
     getInitialState: function() {
-        return App.attributes;
+        return Config.attributes;
     },
     _onChange: function(){
-        this.setState(App.attributes);
+        this.setState(Config.attributes);
     },
     render: function () {
       return (
@@ -28,6 +28,8 @@ module.exports = React.createClass({
             <dd>{this.state.public_key}</dd>
             <dt>Discourse URL</dt>
             <dd>{this.state.dc_url}</dd>
+            <dt>Active Services</dt>
+            <dd>{this.state.services}</dd>
           </dl>
         </ReactTransitionGroup>
         );

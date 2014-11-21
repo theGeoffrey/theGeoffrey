@@ -5,16 +5,16 @@
 'use strict';
 
 var React = require('react/addons'),
-    services = require('./services/_services'),
+    APPS = require('./apps/_index'),
     Link = require('react-router-component').Link;
 
 
 module.exports = React.createClass({
         render: function(){
-            var Service = services[this.props.service];
+            var App = APPS[this.props.app];
             return(
                   <div>
-                    <Service />
+                    <App />
                     <Link href="/">back</Link>
                   </div>
                 )

@@ -14,10 +14,10 @@ module.exports = React.createClass({
                     Services:
                     <ul>
                         <li>
-                            <Link href="/services/mailchimp">Mailchimp</Link>.
+                            <Link href="/apps/mailchimp">Mailchimp</Link>.
                         </li>
                         <li>
-                            <Link href="/services/forms">Forms</Link>.
+                            <Link href="/apps/forms">Forms</Link>.
                         </li>
                         <li>
                             <Link href="/add_service/">+ Add</Link>.
