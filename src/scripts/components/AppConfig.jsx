@@ -10,7 +10,7 @@ var React = require('react/addons'),
 
 module.exports = React.createClass({
     componentDidMount: function() {
-        App.on('all', this._onChange);
+        App.on('all sync', this._onChange);
     },
     getInitialState: function() {
         return App.attributes;

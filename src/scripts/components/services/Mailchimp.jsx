@@ -10,7 +10,7 @@ var React = require('react/addons'),
 
 var Mailchimp = React.createClass({
   _key: 'mailchimp',
-  _keys: ['api_key'],
+  _sync_keys: ['api_key'],
   mixins: [SimpleServiceMixin],
   render: function(){
     return(

@@ -14,8 +14,8 @@ var Model = require('backbone-model').Model,
                     break
                 case 'create':
                 case 'patch':
-                    // alert(model);
-                    options.success(model.attributes);
+                    console.log(model.attributes);
+                    options.success({});
                     break;
                 default:
                     // alert(method);
@@ -31,7 +31,7 @@ AppDispatcher.register(function(payload) {
         case 'updateConfig':
             var update = {};
                 update[payload.key] = payload.content
-            return appConfig.save(update, {patch: true});
+            return appConfig.save(update, {patch: true, success: function(){console.log(arguments);}});
         case 'initApp':
             return appConfig.fetch()
         default:
