@@ -26,12 +26,11 @@ var Model = require('backbone-model').Model,
 
 var appConfig = new AppConfigModel({});
 
-AppDispatcher.register(function(payload) {
-    switch(payload.actionType){
+AppDispatcher.register(function(evt) {
+    switch(evt.actionType){
         case 'updateConfig':
-            var update = {};
-                update[payload.key] = payload.content
-            return appConfig.save(update, {patch: true, success: function(){console.log(arguments);}});
+            return appConfig.save(evt.payload,
+                {patch: true});
         case 'initApp':
             return appConfig.fetch()
         default:

@@ -2,11 +2,10 @@
 var AppDispatcher = require('../dispatchers/App');
 
 module.exports = {
-    updateConfig: function(key, content) {
+    updateConfig: function(payload) {
         return AppDispatcher.dispatch({
             actionType: 'updateConfig',
-            key: key,
-            content: content
+            payload: payload
         });
     }
 }
