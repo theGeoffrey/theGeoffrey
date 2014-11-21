@@ -16,8 +16,10 @@ MAILCHIMP_BASE_URL = "https://{dc}.api.mailchimp.com/2.0/{section}/{name}"
 class MailChimpApiError(Exception):
     pass
 
+
 class MailChimpConfigError(Exception):
     pass
+
 
 def _query_mailchimp(data_center, method_section, method_name, payload):
 
