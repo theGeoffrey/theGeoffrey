@@ -14,11 +14,15 @@
     "backbone-model": "^1.0.6",
     "backbone-react-component": "^0.7.2",
     "backbone-router": "0.0.0",
+    "bootstrap-webpack": "0.0.3",
     "flux": "^2.0.1",
+    "font-awesome": "^4.2.0",
+    "font-awesome-webpack": "0.0.2",
     "jquery": "^2.1.1",
     "object-assign": "^1.0.0",
-    "react": "~0.11.2",
-    "react-router-component": "^0.22.0"
+    "react": "^0.12.1",
+    "react-bootstrap": "^0.13.0",
+    "react-router-component": "git://github.com/STRML/react-router-component.git#react-0.12"
   },
   "devDependencies": {
     "grunt": "~0.4.5",
