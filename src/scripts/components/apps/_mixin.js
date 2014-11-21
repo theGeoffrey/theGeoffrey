@@ -59,10 +59,11 @@ module.exports = {
         }
 
         var add = [],
-            remove = []
+            remove = [],
             refs = this.refs;
         _.each(services, function(service){
-            if (refs[service].getDOMNode().value === "on"){
+            console.log(refs[service].getDOMNode().checked);
+            if (refs[service].getDOMNode().checked){
                 add.push(service);
             } else {
                 remove.push(service);
