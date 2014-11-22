@@ -20,7 +20,8 @@ module.exports = React.createClass({
                 </div>
                 <div className="panel-body">
                     {_helpers.render_apps_list(
-                        APPS.get_active_apps(this.state), true)}
+                        APPS.get_apps_to_add(this.state))}
+                    <Link href="/">Home</Link>
                 </div>
             </div>
             )

@@ -11,8 +11,14 @@ var React = require('react/addons'),
 
 module.exports = React.createClass({
         render: function(){
-            var App = APPS[this.props.app];
-            return(
+            var App = APPS.get_app(this.props.app);
+            if(!App) {
+                return (<div>Loading</div>)
+            }
+
+            App = App.component;
+
+            return (
                 <div>
                     <App />
                     <Link href="/">back</Link>

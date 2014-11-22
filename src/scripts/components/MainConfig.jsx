@@ -4,19 +4,12 @@
 
 var React = require('react/addons'),
     ReactBackboneMixin = require('backbone-react-component'),
+    _helpers = require('./_helpers'),
     Config = require('../stores/Config');
 
 
 module.exports = React.createClass({
-    componentDidMount: function() {
-        Config.on('all sync', this._onChange);
-    },
-    getInitialState: function() {
-        return Config.attributes;
-    },
-    _onChange: function(){
-        this.setState(Config.attributes);
-    },
+    mixins: [_helpers.configRerenderMixin],
     render: function () {
       return (
         <div className="panel panel-default">
