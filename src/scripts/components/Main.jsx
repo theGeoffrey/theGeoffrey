@@ -8,6 +8,7 @@ var React = require('react/addons'),
     Router = require('./Router'),
     MainDispatcher = require('../dispatchers/Main'),
     Button = require('react-bootstrap').Button,
+    Link = require('react-router-component').Link
     ButtonToolbar = require('react-bootstrap').ButtonToolbar,
     MainConfig = require('./MainConfig');
 
@@ -25,19 +26,15 @@ var MainApp = React.createClass({
   },
   render: function() {
     return (
-      <div className='main'>
-        <ButtonToolbar>
-            <Button>Default</Button>
-            <Button bsStyle="primary"><i className="fa fa-heart"></i>Primary</Button>
-            <Button bsStyle="success"><i className="fa fa-envelop"></i>Success</Button>
-            <Button bsStyle="info"><i className="fa fa-times"></i>Info</Button>
-            <Button bsStyle="warning"><i className="fa fa-bang"></i>Warning</Button>
-            <Button bsStyle="danger"><i className="fa fa-error"></i>Danger</Button>
-            <Button bsStyle="link"><i className="fa fa-link"></i>Link</Button>
-        </ButtonToolbar>
-        <MainConfig />
-        <Router />
-      </div>
+        <div>
+          <div className='container'>
+            <Link href="/"><h1>theGeoffrey</h1></Link>
+          </div>
+          <div className='main container'>
+            <MainConfig />
+            <Router />
+          </div>
+        </div>
     );
   }
 });

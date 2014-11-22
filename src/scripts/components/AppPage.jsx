@@ -13,10 +13,10 @@ module.exports = React.createClass({
         render: function(){
             var App = APPS[this.props.app];
             return(
-                  <div>
+                <div>
                     <App />
                     <Link href="/">back</Link>
-                  </div>
+                </div>
                 )
         }
     });

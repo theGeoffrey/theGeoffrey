@@ -1,6 +1,11 @@
+/**
+ * @jsx React.DOM
+ */
 
 var updateConfig = require('../../actions/Config').updateConfig,
     _ = require('underscore'),
+    React = require('react'),
+    Link = require('react-router-component').Link
     CONFIG = require('../../stores/Config');
 
 module.exports = {
@@ -70,5 +75,19 @@ module.exports = {
             }
         });
         return [add, remove];
+    },
+    render: function(){
+        var component = this._render();
+        return (
+            <div className="panel panel-primary">
+                <div className="panel-heading">
+                    <h3 className="panel-title">
+                        <Link href="/">Apps</Link> <i className="fa fa-angle-double-right"></i> {this._name}
+                    </h3>
+                </div>
+                <div className="panel-body">
+                    {component}
+                </div>
+            </div>)
     }
 }
