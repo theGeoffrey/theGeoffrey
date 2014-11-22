@@ -16,7 +16,7 @@ var React = require('react/addons'),
 (window !== window.top ? window.top : window).React = React;
 
 // CSS
-require('../../styles/main.css');
+require('../../styles/main.less');
 
 var imageURL = require('../../images/yeoman.png');
 

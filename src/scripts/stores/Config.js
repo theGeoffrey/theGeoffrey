@@ -9,7 +9,10 @@ var Model = require('backbone-model').Model,
                         'id': 1,
                         'api_key': 'C5A24A08-7148-11E4-B99B-375BBC5C6E8B',
                         'public_key': 'CC229630-7148-11E4-9485-375BBC5C6E8B',
-                        'dc_url': 'http://example.geoffrey.xyz'
+                        'dc_url': 'http://example.geoffrey.xyz',
+                        "mailchimp": {
+                            'api_key': 'TE ST'
+                        }
                     })
                     break
                 case 'create':

@@ -1,5 +1,17 @@
 module.exports = {
   scripts: {
+    'transition': false,
+    'alert': false,
+    'button': false,
+    'carousel': false,
+    'collapse': false,
+    'dropdown': false,
+    'modal': false,
+    'tooltip': false,
+    'popover': false,
+    'scrollspy': false,
+    'tab': false,
+    'affix': false
   },
   styles: {
     "mixins": true,

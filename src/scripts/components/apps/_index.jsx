@@ -2,11 +2,12 @@
 var _ = require('underscore');
 
 
-function key_checker(key, inverse){
+function _key_checker(key, inverse){
     return function(config){
-        var contains = _.contains(config, key);
+        var contains = _.isObject(config[key]);
         if (inverse) { contains =! contains};
-        return contains
+        console.log(config, key, contains);
+        return contains;
     }
 }
 
@@ -18,8 +19,8 @@ var index = {
         letter: 'M',
         bg_color: '#2C9AB7',
         color: 'white',
-        show_on_overview: key_checker('mailchimp'),
-        can_add: key_checker('mailchimp', true),
+        show_on_overview: _key_checker('mailchimp'),
+        can_add: _key_checker('mailchimp', true),
         component: require('./Mailchimp'),
     }
 }
