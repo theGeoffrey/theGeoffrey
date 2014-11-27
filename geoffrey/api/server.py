@@ -1,4 +1,6 @@
 from werkzeug.exceptions import Unauthorized
+from werkzeug import formparser
+from werkzeug.wrappers import Request
 from twisted.internet import defer
 from twisted.python import log
 from klein import Klein
@@ -55,7 +57,7 @@ class GeoffreyApi(Klein):
 
     def public(self, func):
         def secured_public(request):
-            key = request.args.get('public_key', [None])[0]
+            key = request.args.get('public_key', [None])[0] or request.form.get('public_key', [None])[0]
             if not key:
                 raise Unauthorized()
             return self.config_getter.get_by_public_key(request, key).addCallback(func)
@@ -78,13 +80,26 @@ def add_user(request):
     return '{"succeed": true}'
 
 
+@app.route('/posts/new', methods=["POST"])
+@app.secure
+def add_post(request):
+
+    payload = json.loads(request.content.read())
+
+    for func in get_active_services_for_api(request.config, 'new_post', tasks):
+        func.delay(request.config, payload)
+
+    print("RECEIVED NEW POST WITH LOAD {}".format(payload))
+
+    return '{"succeed": true}'
+
+
 @app.route('/forms/add', methods=['POST'])
 @app.public
 def add_form(request):
-    payload = json.loads(request.content.read())
-
+  
     for func in get_active_services_for_api(request.config, 'add_form', tasks):
-        func.delay(request.config, payload)
+        func.delay(request.config, request.form)
 
     return '{"succeed": true}'
 

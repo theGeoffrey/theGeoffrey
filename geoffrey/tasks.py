@@ -10,7 +10,7 @@ from geoffrey.services import forms
 from geoffrey import config
 from geoffrey.utils import get_params
 from geoffrey.services import mailchimp
-from geoffrey import discourse as dc
+from geoffrey.discourse import DiscourseClient
 from celery.bin.worker import worker
 import logging
 import eventlet
