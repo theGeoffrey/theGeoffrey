@@ -11,8 +11,6 @@ function _key_checker(key, inverse){
     }
 }
 
-
-
 var index = {
     mailchimp: {
         name: 'MailChimp',
@@ -22,11 +20,18 @@ var index = {
         show_on_overview: _key_checker('mailchimp'),
         can_add: _key_checker('mailchimp', true),
         component: require('./Mailchimp'),
+    },
+
+    forms: {
+        name: 'Forms',
+        letter: 'F',
+        bg_color: '#FF6699',
+        color: 'white',
+        show_on_overview: _key_checker('forms'),
+        can_add: _key_checker('forms', true),
+        component: require('./Forms'),
     }
 }
-
-
-
 
 
 function find_apps(func_name){
