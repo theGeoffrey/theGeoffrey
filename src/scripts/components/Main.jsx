@@ -4,6 +4,8 @@
 
 'use strict';
 
+require("../stores/_db.js");
+
 var React = require('react/addons'),
     Router = require('./Router'),
     MainDispatcher = require('../dispatchers/Main'),

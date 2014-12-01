@@ -12,6 +12,7 @@
   "dependencies": {
     "backbone": "^1.1.2",
     "backbone-model": "^1.0.6",
+    "backbone-pouch": "^1.4.0",
     "backbone-react-component": "^0.7.2",
     "backbone-router": "0.0.0",
     "bootstrap-webpack": "0.0.3",
@@ -20,6 +21,7 @@
     "font-awesome-webpack": "0.0.2",
     "jquery": "^2.1.1",
     "object-assign": "^1.0.0",
+    "pouchdb": "^3.1.0",
     "react": "^0.12.1",
     "react-bootstrap": "^0.13.0",
     "react-router-component": "git://github.com/STRML/react-router-component.git#react-0.12",
