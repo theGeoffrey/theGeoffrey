@@ -23,3 +23,12 @@
 
  - Font-Awesome
    http://fortawesome.github.io/Font-Awesome/
+
+## INSTALLATION:
+	
+	npm install
+	npm install -g grunt-cli
+
+## Run app:
+
+	grunt serve
