@@ -102,6 +102,11 @@ def add_form(request):
 
     return '{"succeed": true}'
 
+@app.route("/server_config.json")
+def config(request):
+    return """window.GEOF_CONFIG = {
+      COUCHDB_DOMAIN: "{}"
+    }""".format(CONFIG.COUCHDB_DOMAIN)
 
 @app.route('/ping')
 @app.secure

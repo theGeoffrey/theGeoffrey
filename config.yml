@@ -2,6 +2,7 @@ API_KEY: yay
 PUBLIC_KEY: ola
 API_ENDPOINT: /api
 DEBUG: true
+COUCHDB_DOMAIN: "localhost:5984"
 
 enabled_services: 
   - mailchimp_subscribe
