@@ -26,7 +26,9 @@ module.exports = {
         return cfg
     },
     _onChange: function(){
-        this.setState(this._get_config());
+        if (this.isMounted()) {
+            this.setState(this._get_config())
+        };
     },
     _defaultFormSubmit: function(evt){
         var payload = {},

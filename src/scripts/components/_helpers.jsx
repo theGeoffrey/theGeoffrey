@@ -18,7 +18,9 @@ module.exports = {
           return Config.attributes;
         },
         _onChange: function(){
-         this.setState(Config.attributes);
+          if (this.isMounted()) {
+            this.setState(Config.attributes);
+          }
         },
     },
     render_apps_list: function(apps, has_add){
