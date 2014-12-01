@@ -10,6 +10,7 @@ var Model = require('backbone-model').Model,
                         'api_key': 'C5A24A08-7148-11E4-B99B-375BBC5C6E8B',
                         'public_key': 'CC229630-7148-11E4-9485-375BBC5C6E8B',
                         'dc_url': 'http://example.geoffrey.xyz',
+                        
                         'mailchimp': {
                             'api_key': 'TE ST',
                             'list_id': '12345'
@@ -22,12 +23,13 @@ var Model = require('backbone-model').Model,
                             'title': 'title',
                             'post_message': 'message'
                         },
+
                     })
                     break
                 case 'create':
                 case 'patch':
                     console.log(model.attributes);
-                    options.success({});
+                    setTimeout(options.success, 1);
                     break;
                 default:
                     // alert(method);
