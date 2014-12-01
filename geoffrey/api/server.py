@@ -1,20 +1,22 @@
-from werkzeug.exceptions import Unauthorized
-from werkzeug import formparser
-from werkzeug.wrappers import Request
 from twisted.internet import defer
 from twisted.python import log
+from werkzeug.exceptions import Unauthorized
+
 from klein import Klein
+
 from geoffrey import __version__
 from geoffrey.config import CONFIG
 from geoffrey.utils import get_active_services_for_api
 from geoffrey import tasks
+
 import json
+import treq
 
 
 def auth_wrapper(func):
     def get_by_key(self, request, key):
-        def _set_on_request(config):
-            request.config = config
+        def _set_on_request(cfg):
+            request.config = cfg
             return request
 
         def _replace_error(failure):
@@ -28,30 +30,36 @@ def auth_wrapper(func):
     return get_by_key
 
 
-class LocalConfigGetter(object):
-    @auth_wrapper
-    def get_by_api_key(self, api_key):
-        if api_key != CONFIG.API_KEY:
-            raise Unauthorized()
-        return CONFIG
-
-    @auth_wrapper
-    def get_by_public_key(self, pkey):
-        if pkey != CONFIG.PUBLIC_KEY:
-            raise Unauthorized()
-        return CONFIG
-
-
 class GeoffreyApi(Klein):
 
-    config_getter = LocalConfigGetter()
+    def _get_config(self, db, user=CONFIG.COUCH_ADMIN_USER,
+                    password=CONFIG.COUCH_ADMIN_PASSWORD):
+        target = "http://{}/{}/CONFIG".format(CONFIG.COUCHDB_DOMAIN, db)
+
+        def set_database(config):
+            config['database'] = db
+            return config
+
+        return treq.get(target, auth=(user, password)
+                        ).addCallback(lambda x: x.json()
+                        ).addCallback(set_database)
+
+    @auth_wrapper
+    def _get_by_api_key(self, api_key):
+        access, database = api_key.split("@", 1)
+        user, password = access.split(":", 1)
+        return self._get_config(database, user, password)
+
+    @auth_wrapper
+    def _get_by_public_key(self, pkey):
+        return self._get_config(pkey)
 
     def secure(self, func):
         def secured(request):
             key = request.args.get('key', [None])[0]
             if not key:
                 raise Unauthorized()
-            return self.config_getter.get_by_api_key(request, key).addCallback(func)
+            return self._get_by_api_key(request, key).addCallback(func)
         secured.func_name = func.func_name
         return secured
 
@@ -60,7 +68,7 @@ class GeoffreyApi(Klein):
             key = request.args.get('public_key', [None])[0] or request.form.get('public_key', [None])[0]
             if not key:
                 raise Unauthorized()
-            return self.config_getter.get_by_public_key(request, key).addCallback(func)
+            return self._get_by_public_key(request, key).addCallback(func)
         secured_public.func_name = func.func_name
         return secured_public
 
@@ -89,8 +97,6 @@ def add_post(request):
     for func in get_active_services_for_api(request.config, 'new_post', tasks):
         func.delay(request.config, payload)
 
-    print("RECEIVED NEW POST WITH LOAD {}".format(payload))
-
     return '{"succeed": true}'
 
 
@@ -102,16 +108,18 @@ def add_form(request):
 
     return '{"succeed": true}'
 
+
 @app.route("/server_config.json")
 def config(request):
     return """window.GEOF_CONFIG = {
       COUCHDB_DOMAIN: "{}"
     }""".format(CONFIG.COUCHDB_DOMAIN)
 
+
 @app.route('/ping')
 @app.secure
 def ping(request):
-    return 'Your API key is:{}'.format(request.config.API_KEY)
+    return 'Your API key is:{}'.format(request.config['dc_url'])
 
 
 @app.route('/version')

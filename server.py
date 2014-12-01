@@ -7,7 +7,7 @@ app = Klein()
 
 @app.route('/api/', branch=True)
 def api(request):
-    return api_server
+    return api_server.resource()
 
 
 @app.route('/', branch=True)
