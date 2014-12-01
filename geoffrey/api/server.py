@@ -97,7 +97,6 @@ def add_post(request):
 @app.route('/forms/add', methods=['POST'])
 @app.public
 def add_form(request):
-  
     for func in get_active_services_for_api(request.config, 'add_form', tasks):
         func.delay(request.config, request.form)
 
