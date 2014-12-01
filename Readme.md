@@ -24,7 +24,7 @@
  - Font-Awesome
    http://fortawesome.github.io/Font-Awesome/
 
-## INSTALLATION:
+## Installation:
 	
 	npm install
 	npm install -g grunt-cli
