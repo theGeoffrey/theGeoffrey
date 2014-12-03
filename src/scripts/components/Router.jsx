@@ -13,7 +13,7 @@ module.exports = React.createClass({
 
   render: function() {
     return (
-      <Locations>
+      <Locations onBeforeNavigation={this.props.onBeforeNavigation} onNavigation={this.props.onNavigation}>
         <Location path="/" handler={AppsOverview} />
         <Location path="/apps/add" handler={AddApp} />
         <Location path="/apps/:app" handler={AppPage} />

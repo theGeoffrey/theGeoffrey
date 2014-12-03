@@ -24,6 +24,20 @@ var MainApp = React.createClass({
   componentDidMount: function(){
     MainDispatcher.dispatch({actionType: 'initMain'});
   },
+
+  onBeforeNavigation: function(path){
+    this.setState({"showFullConfig" : path === '/' });
+    console.log('BEFORE', path)
+  },
+
+  onNavigation: function(){
+    console.log('AFTER', arguments)
+  },
+
+  getInitialState: function(){
+    return {'showFullConfig': true};
+  },
+
   render: function() {
     return (
         <div>
@@ -31,8 +45,8 @@ var MainApp = React.createClass({
             <Link href="/"><h1>theGeoffrey</h1></Link>
           </div>
           <div className='main container'>
-            <MainConfig />
-            <Router />
+            <MainConfig showFull={this.state.showFullConfig} />
+            <Router onNavigation={this.onNavigation} onBeforeNavigation={this.onBeforeNavigation}  />
           </div>
         </div>
     );
