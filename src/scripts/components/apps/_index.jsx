@@ -25,7 +25,7 @@ var index = {
     forms: {
         name: 'Forms',
         letter: 'F',
-        bg_color: '#FF6699',
+        bg_color: 'green',
         color: 'white',
         show_on_overview: _key_checker('forms'),
         can_add: _key_checker('forms', true),
