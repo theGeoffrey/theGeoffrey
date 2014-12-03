@@ -49,6 +49,7 @@ module.exports = {
         return false;
     },
     _get_form_data: function(){
+        debugger;
         var keys = this._sync_keys || "",
             refs = this.refs;
         if (keys.length === 0) {
@@ -56,7 +57,7 @@ module.exports = {
         }
 
         return _.object(_.map(keys, function(k){
-                return [k, refs[k].getDOMNode().value.trim()]
+                return [k, refs[k].getValue().trim()]
             }));
     },
     _get_service_definition: function(){
