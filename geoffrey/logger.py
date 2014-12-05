@@ -1,6 +1,7 @@
 
-from datetime import datetime
-from geoffrey.config import CONFIG
+
+from geoffrey.config import CONFIG, get_database_connection
+from geoffrey.utils import db_now
 from twisted.python import failure, log
 import treq
 import json
@@ -9,6 +10,9 @@ import json
 class CouchdbLogger(object):
 
     def __init__(self, config, system=None):
+        self.client = get_database_connection(config['database'],
+                                              CONFIG.COUCHDB_LOGGER_USER,
+                                              CONFIG.COUCHDB_LOGGER_PASSWORD)
         self.config = config
         self.system = system
 
@@ -33,11 +37,9 @@ class CouchdbLogger(object):
                          **payload)
 
     def _log(self, severity, message, _log_errors=True, **payload):
-        url = "http://{}/{}".format(CONFIG.COUCHDB_DOMAIN, self.config['database'])
-        auth = (CONFIG.COUCHDB_LOGGER_USER, CONFIG.COUCHDB_LOGGER_PASSWORD)
         content = {'type': "log",
                    'severity': severity,
-                   'when': datetime.utcnow().isoformat(),
+                   'when': db_now(),
                    'system': self.system,
                    'message': message,
                    'payload': payload}
@@ -45,9 +47,8 @@ class CouchdbLogger(object):
         if 'traceback' in payload:
             content['traceback'] = payload.pop('traceback')
 
-        dfr = treq.post(url, data=json.dumps(content),
-                        headers={'Content-Type': ['application/json']},
-                        auth=auth).addCallback(lambda x: x.json()).addCallback(self._check_response)
+        dfr = self.client.post('', data=json.dumps(content)
+                               ).addCallback(self._check_response)
 
         if _log_errors:
             dfr.addCallback(log.err)
