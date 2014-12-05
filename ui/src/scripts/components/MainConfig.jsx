@@ -21,14 +21,13 @@ module.exports = React.createClass({
     },
 
     getInitialState: function() {
-    return {'showFull': false};  
+        return {'showFull': false};
     },
 
     render: function () {
         console.log('show full config?:', this.state.showFull)
         var hdr = (<h3>Basic Configuration</h3>);
         var panel_key = (this.props.showFull || this.state.showFull) ? '1' : '0';
-      
       return (
          <PanelGroup activeKey={panel_key} onClick={this.changePanelState} accordion>       
             <Panel header={hdr} eventKey='1'>

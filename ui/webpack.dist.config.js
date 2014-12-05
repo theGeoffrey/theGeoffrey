@@ -13,16 +13,24 @@ module.exports = {
   output: {
     publicPath: '/assets/',
     path: 'dist/assets/',
-    filename: 'app.js'
+    filename: '[name].js'
   },
 
   debug: false,
   devtool: false,
-  entry: [
-    '!bootstrap-webpack!./bootstrap.config.js',
-    'font-awesome-webpack!./font-awesome.config.js',
-    './src/scripts/components/Main.jsx'
-  ],
+  entry: {'app': [
+              '!bootstrap-webpack!./bootstrap.config.js',
+              'font-awesome-webpack!./font-awesome.config.js',
+              './src/scripts/MainApp.jsx'],
+          'chat': [
+              '!bootstrap-webpack!./bootstrap.config.js',
+              'font-awesome-webpack!./font-awesome.config.js',
+              './src/scripts/ChatApp.jsx'],
+          'forms': [
+              '!bootstrap-webpack!./bootstrap.config.js',
+              'font-awesome-webpack!./font-awesome.config.js',
+              './src/scripts/FormsApp.jsx']
+        },
 
   stats: {
     colors: true,

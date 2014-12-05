@@ -4,23 +4,23 @@
 
 'use strict';
 
-require("../stores/_db.js");
+require("./stores/_db.js");
 
 var React = require('react/addons'),
-    Router = require('./Router'),
-    MainDispatcher = require('../dispatchers/Main'),
+    Router = require('./components/Router'),
+    MainDispatcher = require('./dispatchers/Main'),
     Button = require('react-bootstrap').Button,
     Link = require('react-router-component').Link
     ButtonToolbar = require('react-bootstrap').ButtonToolbar,
-    MainConfig = require('./MainConfig');
+    MainConfig = require('./components/MainConfig');
 
 // Export React so the devtools can find it
 (window !== window.top ? window.top : window).React = React;
 
 // CSS
-require('../../styles/main.less');
+require('../styles/main.less');
 
-var imageURL = require('../../images/yeoman.png');
+var imageURL = require('../images/yeoman.png');
 
 var MainApp = React.createClass({
   componentDidMount: function(){

@@ -11,19 +11,29 @@ var webpack = require('webpack');
 module.exports = {
 
   output: {
-    filename: 'app.js',
+    filename: '[name].js',
     publicPath: '/assets/'
   },
 
-  cache: true,
-  debug: true,
-  devtool: false,
-  entry: [
-      'webpack/hot/only-dev-server',
-      '!bootstrap-webpack!./bootstrap.config.js',
-      'font-awesome-webpack!./font-awesome.config.js',
-      './src/scripts/components/Main.jsx'
-  ],
+  cache: false,
+  // debug: true,
+  devtool: true,
+  entry: {'app': [
+              'webpack/hot/only-dev-server',
+              '!bootstrap-webpack!./bootstrap.config.js',
+              'font-awesome-webpack!./font-awesome.config.js',
+              './src/scripts/MainApp.jsx'],
+          'chat': [
+              'webpack/hot/only-dev-server',
+              '!bootstrap-webpack!./bootstrap.config.js',
+              'font-awesome-webpack!./font-awesome.config.js',
+              './src/scripts/ChatApp.jsx'],
+          'forms': [
+              'webpack/hot/only-dev-server',
+              '!bootstrap-webpack!./bootstrap.config.js',
+              'font-awesome-webpack!./font-awesome.config.js',
+              './src/scripts/FormsApp.jsx']
+        },
 
   stats: {
     colors: true,
