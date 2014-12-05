@@ -4,6 +4,10 @@ API_ENDPOINT: /api
 DEBUG: true
 COUCHDB_DOMAIN: "localhost:5984"
 
+COUCHDB_LOGGER_USER:  "geoffreybot"
+COUCHDB_LOGGER_PASSWORD: test
+
+
 enabled_services: 
   - mailchimp_subscribe
   - post_form

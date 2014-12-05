@@ -1,5 +1,5 @@
 from pprint import pprint
-
+from datetime import datetime
 
 class MisConfiguredError(Exception):
     pass
@@ -7,6 +7,10 @@ class MisConfiguredError(Exception):
 
 class ProgrammingError(MisConfiguredError):
     pass
+
+
+def db_now():
+    return datetime.utcnow().isoformat()
 
 
 def get_params(config, *args, **kwargs):
@@ -55,7 +59,5 @@ def get_active_services_for_api(config, api_call, module):
 
         if api_call in func.reacts_on_api_calls:
             yield func
-
-
 
 
