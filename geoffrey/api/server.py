@@ -1,5 +1,7 @@
+
 from twisted.internet import defer
 from twisted.python import log
+
 from werkzeug.exceptions import Unauthorized
 
 from klein import Klein
@@ -7,6 +9,7 @@ from klein import Klein
 from geoffrey import __version__
 from geoffrey.config import CONFIG, get_database_connection
 from geoffrey.utils import get_active_services_for_api, db_now
+from geoffrey.services import chat
 from geoffrey import tasks
 
 import json
@@ -55,39 +58,47 @@ class GeoffreyApi(Klein):
     def _get_by_public_key(self, request, pkey):
         return self._get_config(request, pkey)
 
+    def _get_param(self, key_name, request, kwargs):
+        value = None
+        if key_name in kwargs:
+            value = kwargs[key_name]
+        elif key_name in request.args:
+            value = request.args[key_name]
+        elif request.method in ['POST', 'PUT'] and key_name in request.form:
+            value = request.form[key_name]
+
+        if value is None:
+            raise Unauthorized()
+        return value
+
     def secure(self, func):
-        def secured(request):
-            key = request.args.get('key', [None])[0]
-            if not key:
-                raise Unauthorized()
-            return self._get_by_api_key(request, key).addCallback(func)
+        def secured(request, **kwargs):
+            key = self._get_param('key', request, kwargs)
+            return self._get_by_api_key(request, key
+                ).addCallback(func, **kwargs)
         secured.func_name = func.func_name
         return secured
 
     def public(self, func):
-        def secured_public(request):
-            key = request.args.get('public_key', [None])[0] or request.form.get('public_key', [None])[0]
-            if not key:
-                raise Unauthorized()
-            return self._get_by_public_key(request, key).addCallback(func)
+        def secured_public(request, **kwargs):
+            key = self._get_param('public_key', request, kwargs)
+            return self._get_by_public_key(request, key
+                    ).addCallback(func, **kwargs)
         secured_public.func_name = func.func_name
         return secured_public
 
     def with_session(self, func):
 
-        def loading_session(request):
+        def loading_session(request, **kwargs):
             def set_session(session_data):
                 # FIXME: this should be one-time tokens, too
                 request.session = session_data
                 return request
 
-            session = request.args.get('session', [None])[0] or request.form.get('session', [None])[0]
-            if not session:
-                raise Unauthorized()
-
-            return request.db_client.get(session
+            key = self._get_param('session', request, kwargs)
+            return request.db_client.get(key
                        ).addCallback(set_session
-                       ).addCallback(func)
+                       ).addCallback(func, **kwargs)
         loading_session.func_name = func.func_name
         return loading_session
 
@@ -117,32 +128,11 @@ def create_session(request):
         ).addCallback(lambda x: json.dumps(x))
 
 
-@app.route('/apps/chat', methods=["GET"])
+@app.route('/apps/chat/<public_key>/<session>/', branch=True)
 @app.public
 @app.with_session
-def chat_receive(request):
-    user = request.session['user']
-    def fetch_and_post(json_data):
-        results = json_data['results']
-        if not results: return SUCCESS
-        return json.dumps(results[-1]['changes'][0])
-
-    return request.db_client.get(
-            "_changes?filter=chat/my_messages&feed=longpoll&name={}?since=65".format(user)
-            ).addCallback(fetch_and_post)
-
-
-@app.route('/apps/chat', methods=["POST"])
-@app.secure
-def chat_create(request):
-    payload = json.loads(request.content.read())
-    message = {'type': 'chat',
-               'to': payload['to'],
-               'from': payload['from'],
-               'message': payload['message'],
-               'when': db_now()}
-    return request.db_client.post(data=json.dumps(message)
-            ).addCallback(lambda x: SUCCESS)
+def chat_receive(request, **kwargs):
+    return chat.receiver(request)
 
 
 @app.route('/posts/new', methods=["POST"])
