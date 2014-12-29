@@ -1,7 +1,8 @@
 from geoffrey.utils import get_params
 from geoffrey.couchdb_connection import CouchdbConnection
-from pprint import pprint
+
 import yaml
+import os
 
 
 class Config(dict):
@@ -13,8 +14,18 @@ class Config(dict):
         self.update(state)
 
 
+def _recursive_replace(config, prefix=''):
+    for key in config:
+        if isinstance(config[key], dict):
+            _recursive_replace(config[key], prefix=prefix + key + "__")
+        elif prefix+key in os.environ:
+            config[key] = os.environ[prefix+key]
+
+    return config
+
+
 with open("config.yml", "r") as reader:
-    CONFIG = Config(**yaml.load(reader.read()))
+    CONFIG = _recursive_replace(Config(**yaml.load(reader.read())))
 
 
 def get_db_master_config():
