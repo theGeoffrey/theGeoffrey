@@ -26,9 +26,7 @@
     "react": "^0.12.1",
     "react-bootstrap": "^0.13.0",
     "react-router-component": "git://github.com/STRML/react-router-component.git#react-0.12",
-    "underscore": "^1.7.0"
-  },
-  "devDependencies": {
+    "underscore": "^1.7.0",
     "grunt": "~0.4.5",
     "load-grunt-tasks": "~0.6.0",
     "grunt-contrib-connect": "~0.8.0",
