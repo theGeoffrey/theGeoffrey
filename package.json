@@ -1,0 +1,11 @@
+{
+  "name": "geoffrey",
+  "version": "0.0.0",
+  "description": "",
+  "repository": "",
+  "private": true,
+  "scripts": {
+    "preinstall": "cd ui && npm install",
+    "postinstall": "cd ui && ./node_modules/.bin/grunt build"
+  }
+}

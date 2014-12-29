@@ -9,3 +9,6 @@ __pycache__
 child.log
 man/
 *.sqlite
+node_modules
+npm-debug.log
+ui/dist
