@@ -36,8 +36,8 @@ def auth_wrapper(func):
 
 class GeoffreyApi(Klein):
 
-    def _get_config(self, request, db, user=CONFIG.COUCH_ADMIN_USER,
-                    password=CONFIG.COUCH_ADMIN_PASSWORD):
+    def _get_config(self, request, db, user=CONFIG.COUCH_USER,
+                    password=CONFIG.COUCH_PASSWORD):
 
         client = get_database_connection(db, user, password)
 

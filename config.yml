@@ -6,6 +6,8 @@ COUCHDB_DOMAIN: "localhost:5984"
 
 COUCHDB_LOGGER_USER:  "geoffreybot"
 COUCHDB_LOGGER_PASSWORD: test
+COUCH_USER: "geoffreybot"
+COUCH_PASSWORD: test
 
 
 enabled_services: 
