@@ -22,10 +22,10 @@ module.exports = {
               '!bootstrap-webpack!./bootstrap.config.js',
               'font-awesome-webpack!./font-awesome.config.js',
               './src/scripts/MainApp.jsx'],
-          'chat': [
+          'dc-embed': [
               '!bootstrap-webpack!./bootstrap.config.js',
               'font-awesome-webpack!./font-awesome.config.js',
-              './src/scripts/ChatApp.jsx'],
+              './src/scripts/DcEmbed.jsx'],
           'forms': [
               '!bootstrap-webpack!./bootstrap.config.js',
               'font-awesome-webpack!./font-awesome.config.js',

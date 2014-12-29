@@ -10,7 +10,7 @@ def api(request):
     return api_server.resource()
 
 
-@app.route('/', branch=True)
+@app.route('/dashboard/', branch=True)
 def statics(request):
     return File('./ui/dist/')
 

@@ -63,9 +63,9 @@ class GeoffreyApi(Klein):
         if key_name in kwargs:
             value = kwargs[key_name]
         elif key_name in request.args:
-            value = request.args[key_name]
+            value = request.args[key_name][0]
         elif request.method in ['POST', 'PUT'] and key_name in request.form:
-            value = request.form[key_name]
+            value = request.form[key_name][0]
 
         if value is None:
             raise Unauthorized()
@@ -154,6 +154,15 @@ def add_form(request):
         func.delay(request.config, request.form)
 
     return SUCCESS
+
+
+@app.route("/embed_config.json")
+@app.public
+def embed_config(request):
+    # ask the apps what to send...
+    json_p = request.args.get('json_p', [None])[0] or "__startGeoffrey"
+    return "{}({});".format(json_p,
+                            json.dumps({'config': request.config}))
 
 
 @app.route("/server_config.json")

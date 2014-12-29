@@ -12,3 +12,4 @@ man/
 node_modules
 npm-debug.log
 ui/dist
+twistd.pid
