@@ -97,8 +97,6 @@ var Forms = React.createClass({
   _name: "Forms",
   mixins: [_.omit(SimpleAppMixin, '_get_config')],
   _get_config: function(inp){
-    console.log('FORMS????')
-    console.log(CONFIG.attributes[this._key] || 'No forms saved') 
     return {"forms_list": CONFIG.attributes[this._key] || []};
   },
   _render: function(){

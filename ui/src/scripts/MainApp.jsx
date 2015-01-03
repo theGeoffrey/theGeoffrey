@@ -29,11 +29,9 @@ var MainApp = React.createClass({
 
   onBeforeNavigation: function(path){
     this.setState({"showFullConfig" : path === '/' });
-    console.log('BEFORE', path)
   },
 
   onNavigation: function(){
-    console.log('AFTER', arguments)
   },
 
   getInitialState: function(){
