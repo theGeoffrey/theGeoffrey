@@ -26,17 +26,17 @@ var SingleForm = React.createClass({
   _sync_keys: ['form_type', 'category', 'form_key', 'title', 'template', 'post_message'],
   
   saveForm: function(){
-    var forms_list = CONFIG.attributes[F_KEY];
+    var forms_list = CONFIG.attributes[F_KEY] || [];
     forms_list[this.props.index] = this._get_form_data();
-    console.log(this.refs, this._sync_keys, this._get_form_data())
-    updateConfig({F_KEY: forms_list});
+    updateConfig({forms: forms_list});
     return false;
   },
 
   saveNewForm: function(){
-    var forms_list = CONFIG.attributes[F_KEY];
+    var forms_list = CONFIG.attributes[F_KEY] || [];
+    console.log(this.refs, this._sync_keys, this._get_form_data(), forms_list)
     forms_list.push(this._get_form_data())
-    updateConfig({F_KEY: forms_list});
+    updateConfig({forms: forms_list});
     return false;
   },
 
@@ -97,7 +97,7 @@ var Forms = React.createClass({
   _name: "Forms",
   mixins: [_.omit(SimpleAppMixin, '_get_config')],
   _get_config: function(inp){
-    return {"forms_list": CONFIG.attributes[this._key]};
+    return {"forms_list": CONFIG.attributes[this._key] || []};
   },
   _render: function(){
     var empty_form = {'form_type': 'Contact',
