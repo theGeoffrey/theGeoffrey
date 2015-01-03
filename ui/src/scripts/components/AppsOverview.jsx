@@ -6,8 +6,7 @@
 
 var React = require('react/addons'),
     APPS = require('./apps/_index'),
-    _helpers = require('./_helpers'),
-    Link = require('react-router-component').Link;
+    _helpers = require('./_helpers');
 
 
 module.exports = React.createClass({
