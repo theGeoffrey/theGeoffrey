@@ -1,5 +1,5 @@
 var Model = require('backbone-model').Model,
-    sync = require('./_db').sync;
+    sync = require('./_db').sync,
     BackbonePouch = require('backbone-pouch'),
     MainDispatcher = require('../dispatchers/Main'),
     ConfigModel = Model.extend({sync: sync}),

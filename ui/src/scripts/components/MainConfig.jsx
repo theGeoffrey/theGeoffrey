@@ -25,11 +25,10 @@ module.exports = React.createClass({
     },
 
     render: function () {
-        console.log('show full config?:', this.state.showFull)
         var hdr = (<h3>Basic Configuration</h3>);
         var panel_key = (this.props.showFull || this.state.showFull) ? '1' : '0';
       return (
-         <PanelGroup activeKey={panel_key} onClick={this.changePanelState} accordion>       
+         <PanelGroup activeKey={panel_key} onClick={this.changePanelState} accordion>
             <Panel header={hdr} eventKey='1'>
                 <form className='form-horizontal'>
                     <Input type="text" label="APP Key:" value={this.state.api_key} labelClassName="col-xs-2" wrapperClassName="col-xs-10" />

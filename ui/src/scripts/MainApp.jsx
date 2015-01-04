@@ -6,12 +6,12 @@
 
 require("./stores/_db.js");
 
+
 var React = require('react/addons'),
     Router = require('./components/Router'),
     MainDispatcher = require('./dispatchers/Main'),
     Button = require('react-bootstrap').Button,
-    Link = require('react-router-component').Link
-    ButtonToolbar = require('react-bootstrap').ButtonToolbar,
+    Link = require('react-router-component').Link,
     MainConfig = require('./components/MainConfig');
 
 // Export React so the devtools can find it

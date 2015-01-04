@@ -2,7 +2,8 @@
  * @jsx React.DOM
  */
 
-var Router = require('react-router-component'),
+var React = require('react/addons'),
+    Router = require('react-router-component'),
     AppsOverview = require('./AppsOverview'),
     AddApp = require('./AddApp'),
     AppPage = require('./AppPage'),
@@ -13,7 +14,7 @@ module.exports = React.createClass({
 
   render: function() {
     return (
-      <Locations onBeforeNavigation={this.props.onBeforeNavigation} onNavigation={this.props.onNavigation}>
+      <Locations hash onBeforeNavigation={this.props.onBeforeNavigation} onNavigation={this.props.onNavigation}>
         <Location path="/" handler={AppsOverview} />
         <Location path="/apps/add" handler={AddApp} />
         <Location path="/apps/:app" handler={AppPage} />

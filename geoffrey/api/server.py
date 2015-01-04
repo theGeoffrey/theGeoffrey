@@ -135,16 +135,25 @@ def chat_receive(request, **kwargs):
     return chat.receiver(request)
 
 
-@app.route('/posts/new', methods=["POST"])
-@app.secure
-def add_post(request):
+def _api_trigger_wrapper(name):
+    def _wrapped(request):
 
-    payload = json.loads(request.content.read())
+        payload = json.loads(request.content.read())
 
-    for func in get_active_services_for_api(request.config, 'new_post', tasks):
-        func.delay(request.config, payload)
+        for func in get_active_services_for_api(request.config, name, tasks):
+            func.delay(request.config, payload)
 
-    return SUCCESS
+        return SUCCESS
+    _wrapped.func_name = name
+    return app.secure(_wrapped)
+
+
+for item in ["post", "topic"]:
+    app.route('/trigger/{}/new'.format(item), methods=["POST"])(
+        _api_trigger_wrapper("trigger_{}_new".format(item)))
+
+    app.route('/trigger/{}/update'.format(item), methods=["POST"])(
+        _api_trigger_wrapper("trigger_{}_update".format(item)))
 
 
 @app.route('/forms/add', methods=['POST'])
