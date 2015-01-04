@@ -70,9 +70,8 @@ var Configurator = React.createClass({
 var LoginHandler = React.createClass({
   mixins: [Router.NavigatableMixin],
   componentDidMount: function(){
-    console.log(this.props);
 
-    var db = setDB(this.props.key);
+    var db = setDB(this.props.akey);
     this.setState({progress: 15});
 
     var dfr = $.Deferred();
@@ -127,7 +126,7 @@ var LoginHandler = React.createClass({
 var MainApp = React.createClass({
   render: function(){
     return (<Locations hash>
-              <Location path="/login/:key" handler={LoginHandler} />
+              <Location path="/login/:akey" handler={LoginHandler} />
               <Location path="/login" handler={LoginHandler} />
               <Location path="/*" handler={Configurator} />
             </Locations>)
