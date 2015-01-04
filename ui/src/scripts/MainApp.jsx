@@ -14,6 +14,8 @@ var React = require('react/addons'),
     $ = require("jQuery"),
     Twbs = require('react-bootstrap'),
     Button = Twbs.Button,
+    Well = Twbs.Well,
+    Alert = Twbs.Alert,
     ProgressBar = Twbs.ProgressBar,
     Link = require('react-router-component').Link,
     setDB = require("./stores/_db.js").setDB,
@@ -77,42 +79,48 @@ var LoginHandler = React.createClass({
     db.info(function(err, info) {
       console && console.debug(err, info);
       if (err){
-        dfr.rejectWith(err);
+        dfr.reject(err);
       } else {
-        dfr.resolveWith(info);
+        dfr.resolve(info);
       }
     });
 
     dfr.done(function(resp){
-      console && console.log("RESP", resp);
       this.setState({progress: 55, bsStyle: "success", title: "Connected. Fetching config..."});
       var fetch_dfr = $.Deferred();
       fetch_dfr.done(function(){
-        console && console.log(arguments);
         this.setState({progress: 100, title: "Success. Redirecting"});
         this.navigate("/")
       }.bind(this));
 
-      var x = config.fetch({success: function() {console.log(arguments); fetch_dfr.resolve()},
-                   error: function() {console.log(arguments); fetch_dfr.reject()}});
-      console.log(x);
+      config.fetch({success: fetch_dfr.resolve, error: fetch_dfr.reject});
+
       return fetch_dfr;
 
     }.bind(this));
 
     dfr.fail(function(err){
-      this.setState({progress: 100, error:err, bsStyle: "danger",  title: "Login failed."})
+      console.log(err);
+      this.setState({progress: 100, err:err, bsStyle: "danger",  title: "Login failed."})
     }.bind(this));
 
   },
   getInitialState: function(){
-    return {bsStyle: "info", progress: 10, title: "Logging in"}
+    return {bsStyle: "info", err: false, progress: 10, title: "Logging in"}
   },
   render: function(){
-    return (<div><ProgressBar active
+    var post_text;
+
+    if (this.state.err){
+      post_text = (<Alert bsStyle="danger" ><h4>{this.state.err.name}</h4><p>{this.state.err.message}</p></Alert>)
+
+    }
+    return (<Well bsSize="large"><ProgressBar active
                 now={this.state.progress}
                 bsStyle={this.state.bsStyle}
-                label={this.state.title} /></div>)
+                label={this.state.title} />
+                {post_text}
+                </Well>)
   }
 });
 

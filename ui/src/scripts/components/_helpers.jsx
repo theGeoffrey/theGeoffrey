@@ -15,7 +15,7 @@ module.exports = {
           Config.on('all sync', this._onChange);
         },
         getInitialState: function() {
-          return Config.attributes;
+          return _.clone(Config.attributes);
         },
         _onChange: function(){
           if (this.isMounted()) {

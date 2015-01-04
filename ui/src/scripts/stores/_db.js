@@ -1,6 +1,7 @@
 var Backbone = require('backbone'),
     Model = require('backbone-model').Model,
     PouchDB = require('pouchdb/dist/pouchdb.min.js'),
+    MainDispatcher = require('../dispatchers/Main'),
     BackbonePouch = require('backbone-pouch');
 
 
@@ -10,6 +11,8 @@ function _get_endpoint(inp){
 
     if (inp === "geoffrey"){
         return protocol + BASE + "/geoffrey"
+    } else if (inp == "fake"){
+        return "fake";
     }
     // string of the format: base64(USER:PASS@DB)
     var login_source = atob(inp),
@@ -46,6 +49,9 @@ module.exports = {
         console && console.log("Loading from Database: " + server)
         Backbone.sync = BackbonePouch.sync({db: db});
         currentDB = db;
+        if (server === "fake") {
+            MainDispatcher.dispatch({actionType: 'fakeConfig'});
+        }
         return db;
     }
 };

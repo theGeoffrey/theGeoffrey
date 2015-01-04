@@ -8,6 +8,7 @@ var Model = require('backbone-model').Model,
 MainDispatcher.register(function(evt) {
     switch(evt.actionType){
         case 'updateConfig':
+            console.log("SAVE");
             return config.save(evt.payload,
                 {patch: true});
         case 'initMain':
@@ -46,7 +47,7 @@ MainDispatcher.register(function(evt) {
                         'message': 'hello'
                     }
                 })
-            config.trigger('sync')
+            config.save()
             break;
         default:
             break;
