@@ -39,7 +39,12 @@ MainDispatcher.register(function(evt) {
                             'title': 'Top',
                             'post_message': 'MXS'
                         }
-                    ]
+                    ],
+
+                    'twitter': {
+                        'api_key': 'TESTKEYTWITTER',
+                        'message': 'hello'
+                    }
                 })
             config.trigger('sync')
             break;

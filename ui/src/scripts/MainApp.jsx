@@ -4,7 +4,12 @@
 
 'use strict';
 
+<<<<<<< Updated upstream
 ;
+=======
+require("./stores/_db.js");
+require('oauth-js/dist/oauth.js');
+>>>>>>> Stashed changes
 
 
 var React = require('react/addons'),
@@ -19,11 +24,15 @@ var React = require('react/addons'),
     setDB = require("./stores/_db.js").setDB,
     Location = Router.Location,
     Locations = Router.Locations,
-    MainConfig = require('./components/MainConfig'),
     config = Config = require('./stores/Config');
+    OAuth = window.OAuth,
+    MainConfig = require('./components/MainConfig');
+
 
 // Export React so the devtools can find it
 (window !== window.top ? window.top : window).React = React;
+
+OAuth.initialize("2yGtmK5ys0mEOCBtSmI3VGA_c_A");
 
 // CSS
 require('../styles/main.less');
@@ -49,7 +58,7 @@ var Configurator = React.createClass({
   render: function() {
     return (
         <div>
-          <div className='container'>
+          <div className='container geoff-title'>
             <Link href="/"><h1>theGeoffrey</h1></Link>
           </div>
           <div className='main container geoff-maincontainer'>
