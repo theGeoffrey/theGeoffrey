@@ -4,28 +4,48 @@ var Backbone = require('backbone'),
     BackbonePouch = require('backbone-pouch');
 
 
-function _get_endpoint(){
-    var BASE = window.GEOF_CONFIG.COUCHDB_DOMAIN || "localhost:5984";
-    if (!window.location.hash){
-        return "http://" + BASE + "/geoffrey"
+function _get_endpoint(inp){
+    var BASE = window.GEOF_CONFIG.COUCH_SERVER || "localhost:5984",
+        protocol = window.GEOF_CONFIG.COUCH_PROTO || "http://";
+
+    if (inp === "geoffrey"){
+        return protocol + BASE + "/geoffrey"
     }
-    // string of the format: USER:PASS@DB
-    var login_source = atob(window.location.hash.slice(1)),
+    // string of the format: base64(USER:PASS@DB)
+    var login_source = atob(inp),
         parse_a = login_source.split("@", 2),
         database = parse_a[1] || "geoffrey",
         auth = parse_a[0],
-        target = "http://" + auth + "@" + BASE + "/" + database;
+        target = protocol + auth + "@" + BASE + "/" + database;
 
-    console && console.log("Loading from Database: " + target)
     return target;
 }
 
 
-var db = PouchDB(_get_endpoint());
-
-Backbone.sync = BackbonePouch.sync({db: db});
 Backbone.Model.prototype.idAttribute = '_id';
 Model.prototype.idAttribute = '_id';
 
+var currentDB;
+
 // Setup our PouchDB adapter
-module.exports = {db: db, sync: Backbone.sync};
+module.exports = {
+    sync: function proxy_sync(method, model, options) {
+        return Backbone.sync.call(this, method, model, options);
+    },
+    setDB: function(access_key) {
+        var server;
+        try {server = _get_endpoint(access_key);}catch(e){}
+        while (!server){
+          try {
+            server = _get_endpoint(prompt("Please provide the access key:"));
+          } catch (e){
+            console.warn(e);
+          }
+        }
+        var db = PouchDB(server);
+        console && console.log("Loading from Database: " + server)
+        Backbone.sync = BackbonePouch.sync({db: db});
+        currentDB = db;
+        return db;
+    }
+};
