@@ -21,20 +21,13 @@ var Twitter = React.createClass({
   signinTwitter: function () {
     OAuth.popup('twitter', {cache: true}).done(function(twitter) {
       console.log(twitter);
-      getTwitterToken();
+      
     }).fail(function(err) {
       throw('No luck signing you in!')
     })
   },
   
-  // getTwitterToken: function (){
-  //   oauthResult.get(url).done(function(data) {
-  //     console.log(data);
-  //   }).fail(function(err) {
-  //     throw('No luck getting token!')
-  //   });
-  // },
-
+  
   _render: function(){
     return(
         <form onSubmit={this._defaultFormSubmit} className='form-horizontal'>

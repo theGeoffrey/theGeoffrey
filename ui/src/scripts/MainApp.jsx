@@ -4,13 +4,8 @@
 
 'use strict';
 
-<<<<<<< Updated upstream
-;
-=======
 require("./stores/_db.js");
 require('oauth-js/dist/oauth.js');
->>>>>>> Stashed changes
-
 
 var React = require('react/addons'),
     AppRouter = require('./components/Router'),
