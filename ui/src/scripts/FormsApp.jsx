@@ -52,10 +52,15 @@ var FormsApp = React.createClass({
 
   render: function() {
     return (
-        <div>
-          <div className='container'>
-            <Link href="/"><h1>Geoffrey Forms</h1></Link>
-            Hello {this.state.hello}
+      <div>
+          <div className='mainContainer forms-app'>
+            <Locations hash>
+              <Location path="/form" handler={FormFound} />
+              <Location path="/feedback" handler={Feedback} />
+              <Location path="/contact" handler={Contact} />
+               <Location path="/support" handler={Support} />
+              <NotFound handler={IndexPage} />
+            </Locations>
           </div>
         </div>
     );
