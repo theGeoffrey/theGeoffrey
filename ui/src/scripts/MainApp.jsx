@@ -52,7 +52,7 @@ var Configurator = React.createClass({
           <div className='container'>
             <Link href="/"><h1>theGeoffrey</h1></Link>
           </div>
-          <div className='main container'>
+          <div className='main container geoff-maincontainer'>
             <MainConfig showFull={this.state.showFullConfig} />
             <AppRouter onNavigation={this.onNavigation} onBeforeNavigation={this.onBeforeNavigation}  />
           </div>

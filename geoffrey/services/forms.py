@@ -2,27 +2,19 @@ import pystache
 from pystache import render
 
 feedback = u'''{{#title}}#Feedback: {{title}} {{/title}}
-{{^title}}#{{information.fname}} {{information.lname}}
+{{^title}}#{{fname}} {{lname}}
 {{/title}}
 
-  {{#information}}
    **Poster**
-   **Email**: {{information.email}}
-   **First name**: {{information.fname}}
-   **Last name**: {{information.lname}}
-   {{/information}}
+   **Email**: {{email}}
+   **First name**: {{fname}}
+   **Last name**: {{lname}}
 
-   {{^information}}
+   {{^fname}}
    **Poster:** Anonymous
-   {{/information}}
+   {{/fname}}
 
-   Message: {{#message}}
-   {{message.body}}
-   {{/message}}
-
-   {{^message}}
-   Empty
-   {{/message}}
+   Message: {{body}}
 '''
 
 contact = u'''#New contact: {{information.fname}} {{information.lname}}

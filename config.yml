@@ -13,6 +13,7 @@ COUCH_PASSWORD: test
 enabled_services: 
   - mailchimp_subscribe
   - post_form
+  - tweet_topic
 
 apps:
   mailchimp: 

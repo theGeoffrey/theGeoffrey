@@ -30,6 +30,16 @@ var index = {
         show_on_overview: _key_checker('forms'),
         can_add: _key_checker('forms', true),
         component: require('./Forms'),
+    },
+
+    twitter: {
+        name: 'Twitter',
+        letter: 'T',
+        bg_color: 'red',
+        color: 'white',
+        show_on_overview: _key_checker('twitter'),
+        can_add: _key_checker('twitter', true),
+        component: require('./Twitter'),
     }
 }
 

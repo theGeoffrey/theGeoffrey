@@ -13,16 +13,20 @@ var React = require('react/addons'),
     Panel = rtbs.Panel,
     Accordion = rtbs.Accordion,
     Input = rtbs.Input,
+    Button = rtbs.Button,
+    Modal = rtbs.Modal,
+    OverlayMixin = rtbs.OverlayMixin,
     CONFIG = require('../../stores/Config'),
     F_KEY = 'forms';
 
-var FORM_TEMPLATES = {'Contact': 'some contact form',
-                  'Feedback': 'some feedback form',
-                  'Custom': 'some custom form'
-                  };
+var FORM_TEMPLATES = {'Feedback': '**Contact Form: {{#title}} \nName: {{#name}} \nEmail: {{#email}} \nFeedback: {{#text}}',
+                      'Contact': '**Contact Form: {{#title}} \nName: {{#name}} \nEmail: {{#email}} \nMessage: {{#text}}',
+                      'Support': '**Support Form: {{#title}} \nName: {{#name}} \nEmail: {{#email}} \nQuestion: {{#text}}',
+                      'Custom': 'Create your own form.'
+                    };
 
 var SingleForm = React.createClass({
-  mixins: [_.pick(SimpleAppMixin, '_get_form_data')],
+  mixins: [_.pick(SimpleAppMixin, '_get_form_data'), OverlayMixin],
   _sync_keys: ['form_type', 'category', 'form_key', 'title', 'template', 'post_message'],
   
   saveForm: function(){
@@ -42,13 +46,20 @@ var SingleForm = React.createClass({
 
    getInitialState: function() {
     return {"tmpl" : FORM_TEMPLATES[this.props.form_data.form_type],
-            "ftype" : this.props.form_data.form_type};  
+            "ftype" : this.props.form_data.form_type,
+            isModalOpen: false};  
   },
 
   updateFormType: function(event){
     this.setState({"tmpl" : FORM_TEMPLATES[event.target.value],
                    "ftype" : event.target.value});
     console.log(this.state.tmpl, event) 
+  },
+
+  handleToggle: function () {
+    this.setState({
+      isModalOpen: !this.state.isModalOpen
+    });
   },
 
   render: function(){
@@ -60,20 +71,24 @@ var SingleForm = React.createClass({
                       help="Create your own template in Mustache, or select an existing one" 
                       defaultValue={this.state.tmpl}  placeholder="Create your form in mustache" ref="template" />);
     var selectTmpl = this.state.ftype === 'Custom' ? customTmpl : fixedTmpl;
+    var disabledButton =  <Button className="btn btn-primary btn-form" onClick={this.handleToggle} bsStyle="primary" disabled>Embed Form</Button>;
+    var activeButton =  <Button className="btn btn-primary btn-form" onClick={this.handleToggle} bsStyle="primary">Embed Form</Button>;
+    var embedButton = this.state.ftype === 'Custom' ? disabledButton : activeButton;
     
     return(
-        <form onSubmit={saveCb} className="form-horizontal">
+        <form onSubmit={saveCb} className="forms-form form-horizontal">
           <Input type="text" label="Form key:" labelClassName="col-xs-2" 
                     wrapperClassName="col-xs-10" defaultValue={this.props.form_data.form_key}  
                     placeholder="Enter Form Key" ref="form_key" />
-          <Input type="text" label="Category:" labelClassName="col-xs-2" 
+          <Input type="text" label="Discourse Category:" labelClassName="col-xs-2" 
                     wrapperClassName="col-xs-10" defaultValue={this.props.form_data.category}  
                     placeholder="Category name" ref="category" />
          
           <Input type='select' onChange={this.updateFormType} defaultValue={this.props.form_data.form_type} 
-                    label="Type:" labelClassName="col-xs-2" wrapperClassName="col-xs-10" ref='form_type'>
+                    label="Form Type:" labelClassName="col-xs-2" wrapperClassName="col-xs-10" ref='form_type'>
             <option value="Contact">Contact</option>
             <option value="Feedback">Feedback</option>
+            <option value="Support">Support</option>
             <option value="Custom">Custom</option>
           </Input>
  
@@ -86,9 +101,47 @@ var SingleForm = React.createClass({
                       wrapperClassName="col-xs-10" defaultValue={this.props.form_data.post_message}  
                       placeholder="Message that will be send to user once form has been posted" ref="post_message" /> 
           
-          <button className="btn btn-primary" type="submit">Save</button>
+          <button className="btn btn-primary btn-form" type="submit">Save</button>
+          {embedButton}
         </form>
     );
+  },
+
+  renderOverlay: function () {
+    var framestyle = {textAlign: 'center'};
+    
+    var frame_url;
+    var link_url;
+
+    if (this.state.ftype === 'Contact') {
+      frame_url = "../forms.html#/contact";
+      link_url = "<iframe width='560' height='400' src='http://localhost:8000/apps/forms/contact' frameborder='0' allowfullscreen></iframe>";
+    }
+
+    else if (this.state.ftype === 'Feedback'){
+      frame_url = "../forms.html#/feedback";
+      link_url = "<iframe width='560' height='400' src='http://localhost:8000/apps/forms/feedback' frameborder='0' allowfullscreen></iframe>";
+    }
+    else if (this.state.ftype === 'Support'){
+      frame_url = "../forms.html#/support";
+      link_url = "<iframe width='560' height='400' src='http://localhost:8000/apps/forms/support' frameborder='0' allowfullscreen></iframe>";
+    };
+
+    if (!this.state.isModalOpen || this.state.ftype == 'Custom') {
+      return <span/>;
+    }
+
+    return (
+        <Modal title="Copy the link below to embed the form!" onRequestHide={this.handleToggle}>
+          <div style={framestyle}>
+          <iframe width="560" height="400" src={frame_url} frameBorder="0" allowFullScreen></iframe>
+          </div>
+          <div className="modal-footer">
+            <Input type = 'text' value={link_url} />
+            <button className="btn btn-primary" onClick={this.handleToggle}>Close</button>
+          </div>
+        </Modal>
+      );
   }
 });
 
@@ -101,7 +154,7 @@ var Forms = React.createClass({
   },
   _render: function(){
     var empty_form = {'form_type': 'Contact',
-                      'form_key': 'BVDJKBVJK',
+                      'form_key': '',
                       'category': '',
                       'template': '',
                       'title': '',
@@ -109,6 +162,7 @@ var Forms = React.createClass({
     var new_hdr = (<h3> + Add Form</h3>);
     var saveNew = true
     return(
+      <div>
         <Accordion>      
             {_.map(this.state.forms_list, function(form_data, index){
               
@@ -124,8 +178,8 @@ var Forms = React.createClass({
               <SingleForm form_data={empty_form} saveNew={saveNew} />
             </Panel>
         </Accordion>
-        )
-  }
+        </div>
+        )}
 });
 
 module.exports = Forms;
