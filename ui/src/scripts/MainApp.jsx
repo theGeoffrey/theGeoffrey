@@ -124,9 +124,11 @@ var EnsureLoginWrap = React.createClass({
 var MainApp = React.createClass({
   render: function(){
     return (<div>
-              <div className='container geoff-title'>
-                <Link href="/"><h1>theGeoffrey</h1></Link>
-              </div>
+              <header>
+                <div className='container'>
+                  <h1>theGeoffrey</h1>
+                </div>
+              </header>
               <div className='main container geoff-maincontainer'>
                 <Locations hash>
                   <Location path="/*" handler={EnsureLoginWrap} />

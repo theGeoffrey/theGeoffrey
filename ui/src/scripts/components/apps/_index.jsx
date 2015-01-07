@@ -2,44 +2,10 @@
 var _ = require('underscore');
 
 
-function _key_checker(key, inverse){
-    return function(config){
-        var contains = _.isObject(config[key]);
-        if (inverse) { contains =! contains};
-        return contains;
-    }
-}
-
 var index = {
-    mailchimp: {
-        name: 'MailChimp',
-        letter: 'M',
-        bg_color: '#2C9AB7',
-        color: 'white',
-        show_on_overview: _key_checker('mailchimp'),
-        can_add: _key_checker('mailchimp', true),
-        component: require('./Mailchimp'),
-    },
-
-    forms: {
-        name: 'Forms',
-        letter: 'F',
-        bg_color: 'green',
-        color: 'white',
-        show_on_overview: _key_checker('forms'),
-        can_add: _key_checker('forms', true),
-        component: require('./Forms'),
-    },
-
-    twitter: {
-        name: 'Twitter',
-        letter: 'T',
-        bg_color: 'red',
-        color: 'white',
-        show_on_overview: _key_checker('twitter'),
-        can_add: _key_checker('twitter', true),
-        component: require('./Twitter'),
-    }
+    mailchimp: require('./Mailchimp'),
+    forms: require('./Forms'),
+    twitter: require('./Twitter'),
 }
 
 

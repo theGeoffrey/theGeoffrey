@@ -49,7 +49,6 @@ module.exports = {
         return false;
     },
     _get_form_data: function(){
-        debugger;
         var keys = this._sync_keys || "",
             refs = this.refs;
         if (keys.length === 0) {
@@ -78,13 +77,19 @@ module.exports = {
         });
         return [add, remove];
     },
+    _render_header_style: function(){
+        return {"background-color": this._bg_color, "border-color": this._bg_color, "color": this._color};
+    },
     render: function(){
         var component = this._render();
+        var style = this._render_header_style();
+        var border_style = {"border-color": this._bg_color};
         return (
-            <div className="panel panel-primary">
-                <div className="panel-heading">
+            <div className="panel panel-primary" style={border_style}>
+                <div className="panel-heading" style={style}>
                     <h3 className="panel-title">
-                        <Link href="/">Apps</Link> <i className="fa fa-angle-double-right"></i> {this._name}
+                        <Link href="/">Apps</Link>
+                        <i className="fa fa-angle-double-right"></i> {this._name}
                     </h3>
                 </div>
                 <div className="panel-body">

@@ -7,14 +7,20 @@
 var React = require('react/addons'),
     SimpleAppMixin = require('./_mixin'),
     Router = require('react-router-component'),
+    keyChecker = require("../_helpers").keyChecker,
     rtbs = require('react-bootstrap'),
+    BG_COLOR = '#2C9AB7',
+    COLOR = 'white',
+    NAME = 'MailChimp',
     Input = rtbs.Input;
 
 var Mailchimp = React.createClass({
   _key: 'mailchimp',
   _sync_keys: ['api_key', 'list_id'],
   _services: ['mailchimp_subscribe'],
-  _name: "Mailchimp",
+  _color: COLOR,
+  _bg_color: BG_COLOR,
+  _name: NAME,
   mixins: [SimpleAppMixin],
 
   _render: function(){
@@ -33,4 +39,11 @@ var Mailchimp = React.createClass({
   }
 });
 
-module.exports = Mailchimp;
+module.exports = {
+        name: NAME,
+        letter: 'M',
+        bg_color: BG_COLOR,
+        color: COLOR,
+        show_on_overview: keyChecker('mailchimp'),
+        can_add: keyChecker('mailchimp', true),
+        component: Mailchimp};

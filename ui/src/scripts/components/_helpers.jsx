@@ -23,6 +23,16 @@ module.exports = {
           }
         },
     },
+
+
+    keyChecker: function (key, inverse){
+        return function(config){
+            var contains = _.isObject(config[key]);
+            if (inverse) { contains =! contains};
+            return contains;
+        }
+    },
+
     render_apps_list: function(apps, has_add){
         var add_button = "";
         if (has_add){
@@ -39,14 +49,20 @@ module.exports = {
                 var href = "/apps/" + app[0],
                     app = app[1],
                     styles ={"background-color": app.bg_color,
-                             "color": app.color}
+                             "color": app.color},
+                    icon = app.letter;
+
+                if (app.fa){
+                    var className = "fa fa-" + app.fa;
+                    icon = (<span className={className}></span>)
+                };
 
                 return (
                       <li>
                         <Link href={href}>
                             <span className="appBox"
                                   style={styles}
-                              >{app.letter}</span>
+                              >{icon}</span>
                         {app.name}
                         </Link>
                       </li>)

@@ -7,11 +7,16 @@
 var React = require('react/addons'),
     SimpleAppMixin = require('./_mixin'),
     Router = require('react-router-component'),
+    keyChecker = require("../_helpers").keyChecker,
     rtbs = require('react-bootstrap'),
     Input = rtbs.Input,
+    BG_COLOR = 'rgb(133, 98, 192)',
+    COLOR = 'white',
     OAuth = window.OAuth;
 
 var Twitter = React.createClass({
+  _color: COLOR,
+  _bg_color: BG_COLOR,
   _key: 'twitter',
   _sync_keys: ['api_key', 'tweet_txt', 'tweet_topic'],
   _services: ['tweet_topic', 'post_tweet'],
@@ -47,4 +52,13 @@ var Twitter = React.createClass({
   }
 });
 
-module.exports = Twitter;
+module.exports = {
+        name: 'Twitter',
+        letter: 'T',
+        fa: 'twitter',
+        bg_color: BG_COLOR,
+        color: COLOR,
+        show_on_overview: keyChecker('twitter'),
+        can_add: keyChecker('twitter', true),
+        component: Twitter
+      };

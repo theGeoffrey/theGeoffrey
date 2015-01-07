@@ -12,7 +12,6 @@ var React = require('react/addons'),
 module.exports = React.createClass({
         render: function(){
             var App = APPS.get_app(this.props.app);
-            var color = {color: 'white'}
             if(!App) {
                 return (<div>Loading</div>)
             }
@@ -22,7 +21,7 @@ module.exports = React.createClass({
             return (
                 <div classname= "selected-app-box" >
                     <App />
-                    <Link style= {color} href="/">back</Link>
+                    <Link href="/">back</Link>
                 </div>
                 )
         }

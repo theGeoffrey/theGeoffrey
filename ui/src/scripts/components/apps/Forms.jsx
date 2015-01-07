@@ -9,12 +9,16 @@ var React = require('react/addons'),
     updateConfig = require('../../actions/Config').updateConfig,
     SimpleAppMixin = require('./_mixin'),
     Router = require('react-router-component'),
+    keyChecker = require("../_helpers").keyChecker
     rtbs = require('react-bootstrap'),
     Panel = rtbs.Panel,
     Accordion = rtbs.Accordion,
     Input = rtbs.Input,
     Button = rtbs.Button,
     Modal = rtbs.Modal,
+    BG_COLOR = 'rgb(72, 140, 72)',
+    COLOR = 'white',
+    NAME = 'Forms',
     OverlayMixin = rtbs.OverlayMixin,
     CONFIG = require('../../stores/Config'),
     F_KEY = 'forms';
@@ -145,7 +149,9 @@ var SingleForm = React.createClass({
 
 var Forms = React.createClass({
   _key: F_KEY,
-  _name: "Forms",
+  _name: NAME,
+  _color: COLOR,
+  _bg_color: BG_COLOR,
   mixins: [_.omit(SimpleAppMixin, '_get_config')],
   _get_config: function(inp){
     return {"forms_list": CONFIG.attributes[this._key] || []};
@@ -180,4 +186,12 @@ var Forms = React.createClass({
         )}
 });
 
-module.exports = Forms;
+module.exports = {
+        name: NAME,
+        letter: 'F',
+        bg_color: BG_COLOR,
+        color: COLOR,
+        show_on_overview: keyChecker('forms'),
+        can_add: keyChecker('forms', true),
+        component: Forms
+      };
