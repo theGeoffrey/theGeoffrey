@@ -8,7 +8,7 @@ require("./stores/_db.js");
 require('oauth-js/dist/oauth.js');
 
 var React = require('react/addons'),
-    AppRouter = require('./components/Router'),
+    Configurator = require('./components/Configurator'),
     Router = require('react-router-component'),
     MainDispatcher = require('./dispatchers/Main'),
     $ = require("jQuery"),
@@ -37,29 +37,6 @@ require('../styles/main.less');
 
 var imageURL = require('../images/yeoman.png');
 
-var Configurator = React.createClass({
-  componentDidMount: function(){
-    MainDispatcher.dispatch({actionType: 'initMain'});
-  },
-
-  onBeforeNavigation: function(path){
-    this.setState({"showFullConfig" : path === '/' });
-  },
-
-  onNavigation: function(){
-  },
-
-  getInitialState: function(){
-    return {'showFullConfig': true};
-  },
-
-  render: function() {
-    return (<div>
-              <MainConfig showFull={this.state.showFullConfig} />
-              <AppRouter onNavigation={this.onNavigation} onBeforeNavigation={this.onBeforeNavigation}  />
-            </div>);
-  }
-});
 
 var LoginHandler = React.createClass({
   mixins: [Router.NavigatableMixin],
@@ -124,9 +101,7 @@ var EnsureLoginWrap = React.createClass({
 
   mixins: [Router.NavigatableMixin],
   componentWillMount: function(){
-    console.log(this.getPath())
     if (!hasDB() && this.getPath().indexOf('/login') != 0) {
-      console.log("leaving")
       this.navigate("#/login");
     }
   },
@@ -145,26 +120,25 @@ var MainApp = React.createClass({
   render: function(){
 
     var version = (<p>{window.GEOF_CONFIG.version}</p>),
-        error;
+        box = (<Locations hash>
+                        <Location path="/*" handler={EnsureLoginWrap} />
+                      </Locations>);
     if (!window.GEOF_CONFIG.version){
-      var error = (<div className="container">
+      var box = (<div className="container">
                     <Alert bsStyle="danger" >
                       <h4>Connection to API Server failed</h4>
                       <p>please reload</p>
                     </Alert>
-                  </div>)
+                  </div>);
     }
+
     return (<div>
               <div className='container geoff-title'>
                 <Link href="/"><h1>theGeoffrey</h1></Link>
                 {{version}}
               </div>
-              {{error}}
-
               <div className='main container geoff-maincontainer'>
-                <Locations hash>
-                  <Location path="/*" handler={EnsureLoginWrap} />
-                </Locations>
+                {{box}}
               </div>
             </div>)
   }

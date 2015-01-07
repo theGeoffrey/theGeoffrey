@@ -70,7 +70,6 @@ module.exports = {
             remove = [],
             refs = this.refs;
         _.each(services, function(service){
-            console.log(refs[service].getDOMNode().checked);
             if (refs[service].getDOMNode().checked){
                 add.push(service);
             } else {

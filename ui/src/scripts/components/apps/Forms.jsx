@@ -38,7 +38,6 @@ var SingleForm = React.createClass({
 
   saveNewForm: function(){
     var forms_list = CONFIG.attributes[F_KEY] || [];
-    console.log(this.refs, this._sync_keys, this._get_form_data(), forms_list)
     forms_list.push(this._get_form_data())
     updateConfig({forms: forms_list});
     return false;
@@ -47,13 +46,12 @@ var SingleForm = React.createClass({
    getInitialState: function() {
     return {"tmpl" : FORM_TEMPLATES[this.props.form_data.form_type],
             "ftype" : this.props.form_data.form_type,
-            isModalOpen: false};  
+            isModalOpen: false};
   },
 
   updateFormType: function(event){
     this.setState({"tmpl" : FORM_TEMPLATES[event.target.value],
                    "ftype" : event.target.value});
-    console.log(this.state.tmpl, event) 
   },
 
   handleToggle: function () {

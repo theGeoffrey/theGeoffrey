@@ -6,7 +6,6 @@ function _key_checker(key, inverse){
     return function(config){
         var contains = _.isObject(config[key]);
         if (inverse) { contains =! contains};
-        console.log(config, key, contains);
         return contains;
     }
 }
