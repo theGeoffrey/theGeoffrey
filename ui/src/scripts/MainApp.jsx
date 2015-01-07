@@ -19,6 +19,7 @@ var React = require('react/addons'),
     ProgressBar = Twbs.ProgressBar,
     Link = require('react-router-component').Link,
     setDB = require("./stores/_db.js").setDB,
+    hasDB = require("./stores/_db.js").hasDB,
     Location = Router.Location,
     Locations = Router.Locations,
     config = Config = require('./stores/Config');
@@ -49,21 +50,14 @@ var Configurator = React.createClass({
   },
 
   getInitialState: function(){
-    return {'showFullConfig': true, "loading": true};
+    return {'showFullConfig': true};
   },
 
   render: function() {
-    return (
-        <div>
-          <div className='container geoff-title'>
-            <Link href="/"><h1>theGeoffrey</h1></Link>
-          </div>
-          <div className='main container geoff-maincontainer'>
-            <MainConfig showFull={this.state.showFullConfig} />
-            <AppRouter onNavigation={this.onNavigation} onBeforeNavigation={this.onBeforeNavigation}  />
-          </div>
-        </div>
-    );
+    return (<div>
+              <MainConfig showFull={this.state.showFullConfig} />
+              <AppRouter onNavigation={this.onNavigation} onBeforeNavigation={this.onBeforeNavigation}  />
+            </div>);
   }
 });
 
@@ -111,7 +105,10 @@ var LoginHandler = React.createClass({
     var post_text;
 
     if (this.state.err){
-      post_text = (<Alert bsStyle="danger" ><h4>{this.state.err.name}</h4><p>{this.state.err.message}</p></Alert>)
+      post_text = (<Alert bsStyle="danger" >
+                    <h4>{this.state.err.name}</h4>
+                    <p>{this.state.err.message}</p>
+                  </Alert>)
 
     }
     return (<Well bsSize="large"><ProgressBar active
@@ -123,13 +120,53 @@ var LoginHandler = React.createClass({
   }
 });
 
-var MainApp = React.createClass({
+var EnsureLoginWrap = React.createClass({
+
+  mixins: [Router.NavigatableMixin],
+  componentWillMount: function(){
+    console.log(this.getPath())
+    if (!hasDB() && this.getPath().indexOf('/login') != 0) {
+      console.log("leaving")
+      this.navigate("#/login");
+    }
+  },
+
   render: function(){
     return (<Locations hash>
-              <Location path="/login/:akey" handler={LoginHandler} />
-              <Location path="/login" handler={LoginHandler} />
-              <Location path="/*" handler={Configurator} />
+                <Location path="/login/:akey" handler={LoginHandler} />
+                <Location path="/login" handler={LoginHandler} />
+                <Location path="/*" handler={Configurator} />
             </Locations>)
+  }
+
+});
+
+var MainApp = React.createClass({
+  render: function(){
+
+    var version = (<p>{window.GEOF_CONFIG.version}</p>),
+        error;
+    if (!window.GEOF_CONFIG.version){
+      var error = (<div className="container">
+                    <Alert bsStyle="danger" >
+                      <h4>Connection to API Server failed</h4>
+                      <p>please reload</p>
+                    </Alert>
+                  </div>)
+    }
+    return (<div>
+              <div className='container geoff-title'>
+                <Link href="/"><h1>theGeoffrey</h1></Link>
+                {{version}}
+              </div>
+              {{error}}
+
+              <div className='main container geoff-maincontainer'>
+                <Locations hash>
+                  <Location path="/*" handler={EnsureLoginWrap} />
+                </Locations>
+              </div>
+            </div>)
   }
 });
 

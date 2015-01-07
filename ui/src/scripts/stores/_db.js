@@ -28,12 +28,15 @@ function _get_endpoint(inp){
 Backbone.Model.prototype.idAttribute = '_id';
 Model.prototype.idAttribute = '_id';
 
-var currentDB;
+var currentDB = null;
 
 // Setup our PouchDB adapter
 module.exports = {
     sync: function proxy_sync(method, model, options) {
         return Backbone.sync.call(this, method, model, options);
+    },
+    hasDB: function(){
+        return currentDB != null;
     },
     setDB: function(access_key) {
         var server;
