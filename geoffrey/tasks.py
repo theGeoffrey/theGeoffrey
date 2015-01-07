@@ -36,7 +36,7 @@ def mailchimp_subscribe(app_config, payload):
 
     dfr = mailchimp.add_single_user_to_mailchimp_list(email, api_key,
                                                       data_center, list_id)
-    
+
     dfr.addErrback(log.err)
     return dfr
 

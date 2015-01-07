@@ -28,7 +28,7 @@ class ChatProtocol(Protocol):
     def dataReceived(self, data):
         try:
             payload = json.loads(data)
-        except:
+        except Exception:
             # FIXME: log this
             return
 

@@ -119,7 +119,7 @@ var EnsureLoginWrap = React.createClass({
 var MainApp = React.createClass({
   render: function(){
 
-    var version = (<p>{window.GEOF_CONFIG.version}</p>),
+    var version = (<p></p>),
         box = (<Locations hash>
                         <Location path="/*" handler={EnsureLoginWrap} />
                       </Locations>);
@@ -127,7 +127,7 @@ var MainApp = React.createClass({
       var box = (<div className="container">
                     <Alert bsStyle="danger" >
                       <h4>Connection to API Server failed</h4>
-                      <p>please reload</p>
+                      <p>Is it possible you are not serving this from the API-Server?</p>
                     </Alert>
                   </div>);
     }
@@ -140,6 +140,13 @@ var MainApp = React.createClass({
               <div className='main container geoff-maincontainer'>
                 {{box}}
               </div>
+              <footer>
+                <div className="text-center">
+                  <p>Running theGeoffrey <span className="version">{window.GEOF_CONFIG.version}</span>.
+                    © 2014 <a href="https://www.github.com/theGeoffrey/">theGeoffrey</a>
+                  </p>
+                </div>
+              </footer>
             </div>)
   }
 });

@@ -36,8 +36,11 @@ if "REDIS_URL" in os.environ:
 
 if "COUCH_URL" in os.environ:
     couch_domain = os.environ['COUCH_URL'].split("@", 1)[1]
+    couch_proto = os.environ['COUCH_URL'].split("://", 1)[0]
     if couch_domain:
         CONFIG['COUCH_DOMAIN'] = couch_domain
+    if couch_proto:
+        CONFIG['COUCH_PROTO'] = couch_proto
 
 
 def get_db_master_config():

@@ -102,20 +102,43 @@ class GeoffreyApi(Klein):
         loading_session.func_name = func.func_name
         return loading_session
 
+    def _api_trigger_wrapper(self, name):
+        def _wrapped(request):
+
+            payload = json.loads(request.content.read())
+
+            for func in get_active_services_for_api(request.config, name, tasks):
+                func.delay(request.config, payload)
+
+            return SUCCESS
+        _wrapped.func_name = name
+
+        return self.secure(_wrapped)
+
+    def trigger_route(self, item):
+
+        self.route('/trigger/{}/new'.format(item), methods=["POST"])(
+            self._api_trigger_wrapper("{}_new".format(item)))
+
+        self.route('/trigger/{}/update'.format(item), methods=["POST"])(
+            self._api_trigger_wrapper("{}_update".format(item)))
+
+    def get_server_settings(self):
+        settings = {"capabilities": {},
+                    "COUCH": {
+                        "DOMAIN": CONFIG.COUCH_DOMAIN,
+                        "PROTO": CONFIG.get('COUCH_PROTO') or 'http'},
+                    "version": __version__,
+                    }
+        return settings
+
 
 app = GeoffreyApi()
 
 
-@app.route('/users/add', methods=["POST"])
-@app.secure
-def add_user(request):
-
-    payload = json.loads(request.content.read())
-
-    for func in get_active_services_for_api(request.config, 'add_user', tasks):
-        func.delay(request.config, payload)
-
-    return SUCCESS
+# Default trigger API
+for item in ["post", "topic", "user"]:
+    app.trigger_route(item)
 
 
 @app.route('/session/create', methods=["POST"])
@@ -125,7 +148,7 @@ def create_session(request):
     payload['type'] = 'session'
     payload['created'] = db_now()
     return request.db_client.post(data=json.dumps(payload)
-        ).addCallback(lambda x: json.dumps(x))
+            ).addCallback(lambda x: json.dumps(x))
 
 
 @app.route('/apps/chat/<public_key>/<session>/', branch=True)
@@ -133,27 +156,6 @@ def create_session(request):
 @app.with_session
 def chat_receive(request, **kwargs):
     return chat.receiver(request)
-
-
-def _api_trigger_wrapper(name):
-    def _wrapped(request):
-
-        payload = json.loads(request.content.read())
-
-        for func in get_active_services_for_api(request.config, name, tasks):
-            func.delay(request.config, payload)
-
-        return SUCCESS
-    _wrapped.func_name = name
-    return app.secure(_wrapped)
-
-
-for item in ["post", "topic"]:
-    app.route('/trigger/{}/new'.format(item), methods=["POST"])(
-        _api_trigger_wrapper("trigger_{}_new".format(item)))
-
-    app.route('/trigger/{}/update'.format(item), methods=["POST"])(
-        _api_trigger_wrapper("trigger_{}_update".format(item)))
 
 
 @app.route('/forms/add', methods=['POST'])
@@ -168,18 +170,12 @@ def add_form(request):
 @app.route("/embed_config.json")
 @app.public
 def embed_config(request):
-    # ask the apps what to send...
     json_p = request.args.get('json_p', [None])[0] or "__startGeoffrey"
+    # FIXME: ask the apps what to send...
+    settings = app.get_server_settings()
     return "{}({});".format(json_p,
-                            json.dumps({'config': request.config}))
-
-
-@app.route("/server_config.json")
-def config(request):
-    return """window.GEOF_CONFIG = {
-      COUCHDB_DOMAIN: "{}"
-    }""".format(CONFIG.COUCHDB_DOMAIN)
-
+                            json.dumps({'settings': settings,
+                                        'config': request.config}))
 
 @app.route('/ping')
 @app.secure
@@ -189,4 +185,4 @@ def ping(request):
 
 @app.route('/version')
 def version(request):
-    return 'This runs Geoffrey %s' % __version__
+    return 'This runs Geoffrey {}'.format(__version__)
