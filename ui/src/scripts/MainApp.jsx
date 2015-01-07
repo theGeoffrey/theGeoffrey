@@ -42,6 +42,8 @@ var LoginHandler = React.createClass({
   mixins: [Router.NavigatableMixin],
   componentDidMount: function(){
 
+    var next = decodeURIComponent(this.props.next || "/");
+
     var db = setDB(this.props.akey);
     this.setState({progress: 15});
 
@@ -60,7 +62,7 @@ var LoginHandler = React.createClass({
       var fetch_dfr = $.Deferred();
       fetch_dfr.done(function(){
         this.setState({progress: 100, title: "Success. Redirecting"});
-        this.navigate("/")
+        this.navigate(next);
       }.bind(this));
 
       config.fetch({success: fetch_dfr.resolve, error: fetch_dfr.reject});
@@ -101,15 +103,18 @@ var EnsureLoginWrap = React.createClass({
 
   mixins: [Router.NavigatableMixin],
   componentWillMount: function(){
-    if (!hasDB() && this.getPath().indexOf('/login') != 0) {
-      this.navigate("#/login");
+    var path = this.getPath();
+    if (!hasDB() && path.indexOf('/login/') != 0) {
+      this.navigate("#/login/?next=" + encodeURIComponent(path));
     }
   },
 
   render: function(){
     return (<Locations hash>
-              <Location path="/login/:akey" handler={LoginHandler} />
-              <Location path="/login" handler={LoginHandler} />
+              <Location path="/login/:akey/\?next=:next" handler={LoginHandler} />
+              <Location path="/login/:akey/" handler={LoginHandler} />
+              <Location path="/login/\?next=:next" handler={LoginHandler} />
+              <Location path="/login/" handler={LoginHandler} />
               <Location path="/*" handler={Configurator} />
             </Locations>)
   }
