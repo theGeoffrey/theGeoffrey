@@ -13,28 +13,17 @@ var React = require('react/addons'),
 
 
 var Configurator = React.createClass({
+  mixins: [Router.NavigatableMixin],
 
   componentDidMount: function(){
     MainDispatcher.dispatch({actionType: 'initMain'});
   },
 
-  onBeforeNavigation: function(path){
-    console.log(path);
-    this.setState({"showFullConfig" : path === '/' });
-  },
-
-  onNavigation: function(path){
-    console.log(path);
-  },
-
-  getInitialState: function(){
-    return {'showFullConfig': true};
-  },
-
   render: function() {
+    var showFullConfig = this.getPath() === '/';
     return (<div>
-              <MainConfig showFull={this.state.showFullConfig} />
-              <Locations hash onBeforeNavigation={this.onBeforeNavigation} onNavigation={this.onNavigation}>
+              <MainConfig showFull={showFullConfig} />
+              <Locations hash>
                 <Location path="/" handler={AppsOverview} />
                 <Location path="/apps/add" handler={AddApp} />
                 <Location path="/apps/:app" handler={AppPage} />

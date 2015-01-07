@@ -108,9 +108,9 @@ var EnsureLoginWrap = React.createClass({
 
   render: function(){
     return (<Locations hash>
-                <Location path="/login/:akey" handler={LoginHandler} />
-                <Location path="/login" handler={LoginHandler} />
-                <Location path="/*" handler={Configurator} />
+              <Location path="/login/:akey" handler={LoginHandler} />
+              <Location path="/login" handler={LoginHandler} />
+              <Location path="/*" handler={Configurator} />
             </Locations>)
   }
 
@@ -118,27 +118,14 @@ var EnsureLoginWrap = React.createClass({
 
 var MainApp = React.createClass({
   render: function(){
-
-    var version = (<p></p>),
-        box = (<Locations hash>
-                        <Location path="/*" handler={EnsureLoginWrap} />
-                      </Locations>);
-    if (!window.GEOF_CONFIG.version){
-      var box = (<div className="container">
-                    <Alert bsStyle="danger" >
-                      <h4>Connection to API Server failed</h4>
-                      <p>Is it possible you are not serving this from the API-Server?</p>
-                    </Alert>
-                  </div>);
-    }
-
     return (<div>
               <div className='container geoff-title'>
                 <Link href="/"><h1>theGeoffrey</h1></Link>
-                {{version}}
               </div>
               <div className='main container geoff-maincontainer'>
-                {{box}}
+                <Locations hash>
+                  <Location path="/*" handler={EnsureLoginWrap} />
+                </Locations>
               </div>
               <footer>
                 <div className="text-center">
