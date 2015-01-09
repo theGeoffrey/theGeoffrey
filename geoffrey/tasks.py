@@ -7,10 +7,11 @@ from twisted.python import log
 from pystache import render
 # from pprint import pprint
 from geoffrey.services import forms
+from geoffrey.services import twitter
 from geoffrey import config
 from geoffrey.utils import get_params
 from geoffrey.services import mailchimp
-from geoffrey.discourse import DiscourseClient
+from geoffrey.discourse import DiscourseClient as dc
 from celery.bin.worker import worker
 import logging
 import eventlet
@@ -60,6 +61,26 @@ def post_form(app_config, payload):
     return dfr
 
 
-mailchimp_subscribe.reacts_on_api_calls = ["add_user"]
+@app.task
+def tweet_topic(app_config, payload):
+    ckey, csecret, discourse_url, tweet_msg = get_params(app_config,
+                                                       'apps.twitter.oauth_key',
+                                                       'apps.twitter.oauth_secret',
+                                                       'dc_url',
+                                                       'apps.twitter.tweet_txt')
+
+    link = '{}/{}'.format(discourse_url, get_params(payload, 'topic_id'))
+    title = None
+
+    if get_params(app_config, 'apps.twitter.tweet_title'):
+        title = get_params(payload, 'title')
+
+    dfr = twitter.post_tweet(ckey, csecret, tweet_msg, link, title)
+    dfr.addErrback(log.err)
+    return dfr
+
+mailchimp_subscribe.reacts_on_api_calls = ["trigger_new_user"]
 mailchimp_batch_subscribe.reacts_on_api_calls = ["add_batch"]
 post_form.reacts_on_api_calls = ["add_form"]
+tweet_topic.reacts_on_api_calls = ["trigger_new_topic"]
+
