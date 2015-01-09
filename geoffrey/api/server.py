@@ -126,7 +126,7 @@ class GeoffreyApi(Klein):
     def get_server_settings(self):
         settings = {"capabilities": {},
                     "COUCH": {
-                        "DOMAIN": CONFIG.COUCH_DOMAIN,
+                        "DOMAIN": CONFIG.COUCHDB_DOMAIN,
                         "PROTO": CONFIG.get('COUCH_PROTO') or 'http'},
                     "version": __version__,
                     }
