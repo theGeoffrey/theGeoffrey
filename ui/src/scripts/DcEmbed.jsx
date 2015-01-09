@@ -17,14 +17,16 @@
     }
 
     function __startGeoffrey(config){
-        console.log(config, Discourse.SiteSettings, Discourse.User.Current());
-        console.log("Started Successfully");
+        if (console && console.log){
+            console.log(config, Discourse.SiteSettings, Discourse.User.current());
+            console.log("Geoffrey embedded successfully.");
+        }
     }
 
     window.__startGeoffrey = __startGeoffrey;
 
     // embed at the
     var gfr = document.createElement('script'); gfr.type = 'text/javascript'; gfr.async = true;
-    gfr.src = endpoint + '/api/embed_config.json?jsonp=__startGeoffrey&public_key=' + public_key;
+    gfr.src = endpoint + 'api/embed_config.json?jsonp=__startGeoffrey&public_key=' + public_key;
     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gfr, s);
 })();

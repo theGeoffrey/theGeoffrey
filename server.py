@@ -1,5 +1,6 @@
 from klein.app import Klein
 from twisted.web.static import File
+from twisted.web import proxy
 from geoffrey.api.server import app as api_server
 
 import json
@@ -12,14 +13,31 @@ def api(request):
     return api_server.resource()
 
 
-@app.route("/dashboard/server_config.js")
+@app.route("/server_config.js")
 def config(request):
     return "window.GEOF_CONFIG = {}".format(
            json.dumps(app.get_server_settings()))
 
 
-@app.route('/dashboard/', branch=True)
-def statics(request):
-    return File('./ui/dist/')
+
+if CONFIG.DEBUG:
+
+    @app.route('/assets/', branch=True)
+    def assets(request):
+        return proxy.ReverseProxyResource('localhost', 8092, '/assets')
+
+    @app.route('/dashboard/', branch=False)
+    def dashboard(request):
+        return proxy.ReverseProxyResource('localhost', 8092, '')
+
+else:
+
+    @app.route('/assets/', branch=True)
+    def assets(request):
+        return File('./ui/dist/assets/')
+
+    @app.route('/dashboard/', branch=False)
+    def dashboard(request):
+        return File('./ui/dist/')
 
 resource = app.resource
