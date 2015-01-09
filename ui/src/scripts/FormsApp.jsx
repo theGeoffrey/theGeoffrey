@@ -16,7 +16,7 @@ var React = require('react/addons'),
     Location = Router.Location;
 
 // Export React so the devtools can find it
-(window !== window.top ? window.top : window).React = React;
+window.React = React;
 
 // CSS
 require('../styles/forms.less');

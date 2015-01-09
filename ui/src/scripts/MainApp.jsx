@@ -28,7 +28,7 @@ var React = require('react/addons'),
 
 
 // Export React so the devtools can find it
-(window !== window.top ? window.top : window).React = React;
+window.React = React;
 
 OAuth.initialize("2yGtmK5ys0mEOCBtSmI3VGA_c_A");
 
