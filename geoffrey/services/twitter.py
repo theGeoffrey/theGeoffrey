@@ -46,15 +46,15 @@ def _query_twitter(ckey, csecret, timestamp, nonce, signature, method, payload):
     dfr = treq.request("POST",
                        TWITTER_BASE_URL.format(method).encode("utf-8"),
                        data=json.dumps(payload),
-                       headers={"Content-Type": "application/json"},
-                                {"Authorization": "OAUTH",
-                                oauth_consumer_key=ckey,
-                                oauth_token=TWITTER_TOKEN,
-                                oauth_nonce=nonce,
-                                oauth_version=TWITTER_VERSION,
-                                oauth_signature_method=TWITTER_SIGN_METHOD,
-                                oauth_timestamp=timestamp,
-                                oauth_signature=signature)
+                       headers={"Content-Type": "application/json",
+                                "Authorization": "OAUTH",
+                                "oauth_consumer_key": ckey,
+                                "oauth_token": TWITTER_TOKEN,
+                                "oauth_nonce": nonce,
+                                "oauth_version": TWITTER_VERSION,
+                                "oauth_signature_method": TWITTER_SIGN_METHOD,
+                                "oauth_timestamp": timestamp,
+                                "oauth_signature": signature})
 
     return dfr.addCallback(_read_response).addCallback(_check_for_error)
 
