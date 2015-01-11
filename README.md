@@ -16,8 +16,12 @@
 
 Start the API Server via:
 
-  bin/twistd -n web --class=api_server.resource
+  bin/twistd -n web --class=server.resource
 
 Start the Backend Workers with Celery
 
    celery -A tasks worker --loglevel=info
+
+Start redis:
+
+ 	redis-server
