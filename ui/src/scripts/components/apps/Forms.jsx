@@ -20,8 +20,7 @@ var React = require('react/addons'),
     COLOR = 'white',
     NAME = 'Forms',
     OverlayMixin = rtbs.OverlayMixin,
-    CONFIG = require('../../stores/Config'),
-    F_KEY = 'forms';
+    CONFIG = require('../../stores/Config');
 
 var FORM_TEMPLATES = {'Feedback': '**Contact Form: {{#title}} \nName: {{#name}} \nEmail: {{#email}} \nFeedback: {{#text}}',
                       'Contact': '**Contact Form: {{#title}} \nName: {{#name}} \nEmail: {{#email}} \nMessage: {{#text}}',
@@ -34,14 +33,14 @@ var SingleForm = React.createClass({
   _sync_keys: ['form_type', 'category', 'form_key', 'title', 'template', 'post_message'],
   
   saveForm: function(){
-    var forms_list = CONFIG.attributes[F_KEY] || [];
+    var forms_list = CONFIG.attributes['forms'] || [];
     forms_list[this.props.index] = this._get_form_data();
     updateConfig({forms: forms_list});
     return false;
   },
 
   saveNewForm: function(){
-    var forms_list = CONFIG.attributes[F_KEY] || [];
+    var forms_list = CONFIG.attributes['forms'] || [];
     forms_list.push(this._get_form_data())
     updateConfig({forms: forms_list});
     return false;
@@ -148,7 +147,7 @@ var SingleForm = React.createClass({
 });
 
 var Forms = React.createClass({
-  _key: F_KEY,
+  _key: 'forms',
   _name: NAME,
   _color: COLOR,
   _bg_color: BG_COLOR,

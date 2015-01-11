@@ -18,7 +18,7 @@ module.exports = {
     _get_config: function(inp){
         var cfg = _.extend(inp || {}, CONFIG.attributes[this._key]);
         if (this._services && this._services.length){
-            var active_services = CONFIG.attributes['services'] || [];
+            var active_services = CONFIG.attributes['enabled_services'] || [];
             _.each(this._services, function(service){
                 cfg[service] = _.contains(active_services, service);
             });
@@ -32,14 +32,14 @@ module.exports = {
     },
     _defaultFormSubmit: function(evt){
         var payload = {},
-            active_services = (CONFIG.attributes || {})['services'] || [];
+            active_services = (CONFIG.attributes || {})['enabled_services'] || [];
             my_services = this._get_service_definition();
 
         // load in defaults
         payload[this._key] = this._get_form_data();
 
         if (my_services){
-            payload['services'] = _.union(
+            payload['enabled_services'] = _.union(
                 _.reject(active_services, function(s){
                     return _.contains(my_services[1], s);
                 }), my_services[0]);
@@ -68,8 +68,9 @@ module.exports = {
         var add = [],
             remove = [],
             refs = this.refs;
+
         _.each(services, function(service){
-            if (refs[service].getDOMNode().checked){
+            if (refs[service] && refs[service].getValue() === 'on'){
                 add.push(service);
             } else {
                 remove.push(service);
