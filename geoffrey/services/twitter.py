@@ -1,19 +1,20 @@
-from geoffrey import config
-from geoffrey.utils import get_params
+from twisted.python import log
+from twisted.web.http_headers import Headers
 
 import logging
 import treq
 import json
-import time
-import random
+from urllib import urlencode
+from oauthlib import oauth1
 
+TWITTER_API_URL = 'https://api.twitter.com/1.1/{}.json'
+TWITTER_STREAM_URL = 'https://stream.twitter.com/1.1/'
+TWITTER_USERSTREAM_URL = 'https://userstream.twitter.com/1.1/'
 
 logger = logging.getLogger("Services:Twitter")
-TWITTER_BASE_URL = "https://api.twitter.com/1.1/{}.json"
-TWITTER_TOKEN = ""
-TWITTER_SECRET = ""
-TWITTER_VERSION = "1.0"
-TWITTER_SIGN_METHOD = "HMAC-SHA1"
+
+TWITTER_CKEY = "rbZIlETSTqBJ7D69IU1lFhgRh"
+TWITTER_CSECRET = "18XZ59n4fDHHtlvc2jrWPjOYLLpOLLNvxnbPJJjbY7RSv6ao3t"
 
 
 class TwitterApiError(Exception):
@@ -24,63 +25,69 @@ class TwitterConfigError(Exception):
     pass
 
 
-def _query_twitter(ckey, csecret, timestamp, nonce, signature, method, payload):
+class TwitterClient(object):
 
-    def _read_response(response):
-        logger.info("Received Data: %s", response)
-        if response.code != 200:
-            logger.info("Received Data with error")
-            raise TwitterApiError("{}".format(response.phrase))
+    def __init__(self, token_key, token_secret, consumer_key=TWITTER_CKEY,
+                 consumer_secret=TWITTER_CSECRET,
+                 api_url=TWITTER_API_URL):
+        self._token_key = token_key
+        self._token_secret = token_secret
+        self._consumer_key = consumer_key
+        self._consumer_secret = consumer_secret
+        self._api_url = api_url
 
-        return treq.text_content(response).addCallback(json.loads)
+    def request(self, http_method, uri, payload={}):
+        def _raise_txt_error(txt):
+            logger.info("ERROR: %s", txt)
+            raise TwitterApiError(txt)
 
-    def _check_for_error(response):
-        logger.info("Received Data: %s", response)
-        if "error" in response:
-            raise TwitterApiError("{}:{}".format(response["name"],
-                                                 response["error"]))
-        return response
+        def _read_response(response):
+            logger.info("Received Data: %s, %s", response.code, response.json)
+            if response.code != 200:
+                logger.info("Received Data with error")
+                return response.text().addCallback(_raise_txt_error)
 
-    logger.info("STARTING QUERY TWITTER WITH PAYLOAD {}".format(payload))
+            return treq.text_content(response).addCallback(json.loads)
 
-    dfr = treq.request("POST",
-                       TWITTER_BASE_URL.format(method).encode("utf-8"),
-                       data=json.dumps(payload),
-                       headers={"Content-Type": "application/json",
-                                "Authorization": "OAUTH",
-                                "oauth_consumer_key": ckey,
-                                "oauth_token": TWITTER_TOKEN,
-                                "oauth_nonce": nonce,
-                                "oauth_version": TWITTER_VERSION,
-                                "oauth_signature_method": TWITTER_SIGN_METHOD,
-                                "oauth_timestamp": timestamp,
-                                "oauth_signature": signature})
+        def _check_for_error(response):
+            logger.info("Received Data: %s", response)
+            if "error" in response:
+                raise TwitterApiError("{}:{}".format(response["name"],
+                                                     response["error"]))
+            return response
 
-    return dfr.addCallback(_read_response).addCallback(_check_for_error)
+        body = urlencode(payload)
+        headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+        client = oauth1.Client(self._consumer_key,
+                               client_secret=self._consumer_secret,
+                               resource_owner_key=self._token_key,
+                               resource_owner_secret=self._token_secret,
+                               encoding='utf-8',
+                               decoding='utf-8')
+        url = TWITTER_API_URL.format(uri)
 
+        logger.info("this is the full url{}".format(url))
+        uri, headers, body = client.sign(url, http_method=http_method,
+                                         headers=headers, body=body)
 
-def post_tweet(ckey, csecret, message, link, title=None):
+        logger.info("this is headers {}".format(headers))
 
-    def _create_tweet(message, link, title):
-        count = 120 - len(message)
-        tweet = "{} {} {}".format(message, title[:count], link)
-        return tweet
+        dfr = treq.request(http_method, url, headers=headers,
+                           data=body)
 
-    timestamp = time.time()
-    nonce = int(random.random()*80000000)
+        return dfr.addCallback(_read_response).addCallback(_check_for_error)
 
-    if title:
-        tweet = _create_tweet(message, link, title)
-    else:
-        tweet = "{} {}".format(message, link)
+    def post_tweet(self, message, link, title=None):
+        def _create_tweet(message, link, title):
+            count = 120 - len(message)
+            tweet = "{} {} {}".format(message, title[:count], link)
+            return tweet
 
+        if title:
+            tweet = _create_tweet(message, link, title)
+        else:
+            tweet = "{} {}".format(message, link)
 
-    return _query_twitter(key, secret, timestamp, nonce,
-                          _get_signature(ckey, tweet,
-                                         timestamp, nonce),
-                          'statuses/update',
-                          {"status": tweet.encode("utf-8")})
+        return self.request('POST', 'statuses/update',
+                            {"status": tweet.encode('utf8')})
 
-
-    def _get_signature(ckey, tweet, timestamp, nonce):
-        return ""
