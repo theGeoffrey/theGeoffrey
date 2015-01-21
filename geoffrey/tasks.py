@@ -7,7 +7,7 @@ from twisted.python import log
 from pystache import render
 # from pprint import pprint
 from geoffrey.services import forms
-from geoffrey.services import twitter
+from geoffrey.services.twitter import TwitterClient
 from geoffrey import config
 from geoffrey.utils import get_params
 from geoffrey.services import mailchimp
@@ -83,7 +83,8 @@ def tweet_topic(app_config, payload):
     if get_params(app_config, 'twitter.tweet_title'):
         title = get_params(payload, 'post.topic_slug')
 
-    dfr = twitter.post_tweet(key, secret, tweet_msg, link, title)
+    client = TwitterClient(key, secret)
+    dfr = client.post_tweet(tweet_msg, link, title)
     dfr.addErrback(log.err)
     return dfr
 
