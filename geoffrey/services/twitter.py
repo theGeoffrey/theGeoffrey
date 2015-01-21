@@ -37,24 +37,16 @@ class TwitterClient(object):
         self._api_url = api_url
 
     def request(self, http_method, uri, payload={}):
-        def _raise_txt_error(txt):
+        def _raise_error(txt):
             logger.info("ERROR: %s", txt)
             raise TwitterApiError(txt)
 
         def _read_response(response):
-            logger.info("Received Data: %s, %s", response.code, response.json)
+            logger.info("Received Data: {}: {}".format(response.code, response.text))
             if response.code != 200:
-                logger.info("Received Data with error")
-                return response.text().addCallback(_raise_txt_error)
+                return response.text().addCallback(_raise_error)
 
             return treq.text_content(response).addCallback(json.loads)
-
-        def _check_for_error(response):
-            logger.info("Received Data: %s", response)
-            if "error" in response:
-                raise TwitterApiError("{}:{}".format(response["name"],
-                                                     response["error"]))
-            return response
 
         body = urlencode(payload)
         headers = {'Content-Type': 'application/x-www-form-urlencoded'}
@@ -65,17 +57,13 @@ class TwitterClient(object):
                                encoding='utf-8',
                                decoding='utf-8')
         url = TWITTER_API_URL.format(uri)
-
-        logger.info("this is the full url{}".format(url))
         uri, headers, body = client.sign(url, http_method=http_method,
                                          headers=headers, body=body)
-
-        logger.info("this is headers {}".format(headers))
 
         dfr = treq.request(http_method, url, headers=headers,
                            data=body)
 
-        return dfr.addCallback(_read_response).addCallback(_check_for_error)
+        return dfr.addCallback(_read_response)
 
     def post_tweet(self, message, link, title=None):
         def _create_tweet(message, link, title):
