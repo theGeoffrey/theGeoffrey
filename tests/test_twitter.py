@@ -1,5 +1,6 @@
 from base_mixin import IntegrationTestMixin
-from unittest import TestCase
+
+from twisted.trial.unittest import TestCase
 
 
 class TestGetParamsHelper(IntegrationTestMixin, TestCase):
