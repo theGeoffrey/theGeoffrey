@@ -61,26 +61,35 @@ def post_form(app_config, payload):
     return dfr
 
 
+def trace_error(failure):
+    failure.value.reasons[0].printDetailedTraceback()
+    return failure
+    # import pdb
+    # pdb.set_trace()
+
+
 @app.task
 def tweet_topic(app_config, payload):
-    ckey, csecret, discourse_url, tweet_msg = get_params(app_config,
-                                                       'apps.twitter.oauth_key',
-                                                       'apps.twitter.oauth_secret',
+    logger.info("PAYLOAD: {}".format(payload))
+    key, secret, discourse_url, tweet_msg = get_params(app_config,
+                                                       'twitter.t_token',
+                                                       'twitter.t_secret',
                                                        'dc_url',
-                                                       'apps.twitter.tweet_txt')
+                                                       'twitter.tweet_txt')
 
-    link = '{}/{}'.format(discourse_url, get_params(payload, 'topic_id'))
+    link = '{}/{}'.format(discourse_url, get_params(payload, 'post.topic_id'))
     title = None
 
-    if get_params(app_config, 'apps.twitter.tweet_title'):
-        title = get_params(payload, 'title')
+    if get_params(app_config, 'twitter.tweet_title'):
+        title = get_params(payload, 'post.topic_slug')
 
-    dfr = twitter.post_tweet(ckey, csecret, tweet_msg, link, title)
+    dfr = twitter.post_tweet(key, secret, tweet_msg, link, title)
     dfr.addErrback(log.err)
     return dfr
 
-mailchimp_subscribe.reacts_on_api_calls = ["trigger_new_user"]
+mailchimp_subscribe.reacts_on_api_calls = ["user_new"]
 mailchimp_batch_subscribe.reacts_on_api_calls = ["add_batch"]
-post_form.reacts_on_api_calls = ["add_form"]
-tweet_topic.reacts_on_api_calls = ["trigger_new_topic"]
+post_form.reacts_on_api_calls = ["form_new"]
+tweet_topic.reacts_on_api_calls = ["topic_new"]
+tweet_topic.reacts_on_api_calls = ["post_new"]
 

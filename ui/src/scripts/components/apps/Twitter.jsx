@@ -19,7 +19,7 @@ var Twitter = React.createClass({
   _color: COLOR,
   _bg_color: BG_COLOR,
   _key: 'twitter',
-  _sync_keys: ['tweet_txt', 'tweet_topic', 'tweet_title'],
+  _sync_keys: ['tweet_txt', 'tweet_title', 't_token', 't_secret'],
   _services: ['tweet_topic', 'post_tweet'],
   _name: "Twitter",
   mixins: [SimpleAppMixin],
@@ -29,11 +29,11 @@ var Twitter = React.createClass({
     OAuth.popup('twitter', {cache: true}).done(function(twitter) {
       console.log(twitter['oauth_token']);
 
-      updateConfig({"twitter" : {"ckey" : twitter['oauth_token'],
-                                "csecret" : twitter['oauth_token_secret'],
+      updateConfig({"twitter" : {"t_token" : twitter['oauth_token'],
+                                "t_secret" : twitter['oauth_token_secret'],
                                 "tweet_txt": this.state.tweet_txt,
-                                "tweet_topic": this.state.tweet_topic}});
-      
+                                "tweet_title": this.state.tweet_title}});
+
     }).fail(function(err) {
       throw('No luck signing you in!')
     })
@@ -52,6 +52,12 @@ var Twitter = React.createClass({
          <Input type='textarea' label="Custom tweet message:" labelClassName="col-xs-2" 
                       wrapperClassName="col-xs-10" defaultValue={this.state.tweet_txt}  
                       placeholder="message" ref="tweet_txt" /> 
+         <Input type='text' label="Token:" labelClassName="col-xs-2" 
+                      wrapperClassName="col-xs-10" value={this.state.t_token}  
+                      readOnly="true" placeholder="authenticate to obtain token" ref="t_token" />
+         <Input type='text' label="Secret:" labelClassName="col-xs-2" 
+                      wrapperClassName="col-xs-10" value={this.state.t_secret}
+                      readOnly="true" placeholder="authenticate to obtain secret" ref="t_secret" />
          <Input type="checkbox"
                    defaultChecked={this.state.tweet_topic}
                    ref="tweet_topic" 
