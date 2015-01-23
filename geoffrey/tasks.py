@@ -8,10 +8,12 @@ from pystache import render
 # from pprint import pprint
 from geoffrey.services import forms
 from geoffrey.services.twitter import TwitterClient
-from geoffrey import config
 from geoffrey.utils import get_params
+from geoffrey.helpers import with_config_environment, with_state
 from geoffrey.services import mailchimp
 from geoffrey.discourse import DiscourseClient as dc
+from geoffrey.config import CONFIG
+
 from celery.bin.worker import worker
 import logging
 import eventlet
@@ -22,8 +24,10 @@ logger = logging.getLogger("Tasks")
 eventlet.hubs.use_hub('twistedr')
 
 app = Celery('tasks')
-app.conf.update(config.CONFIG.CELERY)
-serialization.registry._decoders.pop("application/x-python-serialize")
+app.conf.update(CONFIG.CELERY)
+
+#  what the?
+# serialization.registry._decoders.pop("application/x-python-serialize")
 
 
 @app.task

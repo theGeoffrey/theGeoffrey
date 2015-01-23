@@ -7,7 +7,8 @@ from werkzeug.exceptions import Unauthorized
 from klein import Klein
 
 from geoffrey import __version__
-from geoffrey.config import CONFIG, get_database_connection
+from geoffrey.config import CONFIG
+from geoffrey.helpers import get_database_connection
 from geoffrey.utils import get_active_services_for_api, db_now
 from geoffrey.services import chat
 from geoffrey import tasks

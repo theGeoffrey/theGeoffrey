@@ -1,9 +1,9 @@
 
 
-from geoffrey.config import CONFIG, get_database_connection
+from geoffrey.config import CONFIG
+from geoffrey.helpers import get_database_connection
 from geoffrey.utils import db_now
 from twisted.python import failure, log
-import treq
 import json
 
 
@@ -17,7 +17,8 @@ class CouchdbLogger(object):
         self.system = system
 
     def _check_response(self, response):
-        assert not 'error' in response, "Writing message failed {}".format(response)
+        assert not 'error' in response, \
+            "Writing message failed {}".format(response)
 
     def log(self, message, **payload):
         return self._log('LOG', message, **payload)
