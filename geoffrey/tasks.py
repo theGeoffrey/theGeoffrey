@@ -1,5 +1,4 @@
 from twisted.internet import reactor
-from eventlet.twistedutil import join_reactor, callInGreenThread
 from celery import Celery
 from txcelery.defer import CeleryClient
 from twisted.internet import defer
@@ -16,12 +15,13 @@ from geoffrey.config import CONFIG
 
 from celery.bin.worker import worker
 import logging
-import eventlet
+
+# import eventlet
 from kombu import serialization
 
 logger = logging.getLogger("Tasks")
 
-eventlet.hubs.use_hub('twistedr')
+# eventlet.hubs.use_hub('twistedr')
 
 app = Celery('tasks')
 app.conf.update(CONFIG.CELERY)
@@ -91,6 +91,7 @@ def tweet_topic(app_config, payload):
     dfr = client.post_tweet(tweet_msg, link, title)
     dfr.addErrback(log.err)
     return dfr
+
 
 mailchimp_subscribe.reacts_on_api_calls = ["user_new"]
 mailchimp_batch_subscribe.reacts_on_api_calls = ["add_batch"]
