@@ -6,6 +6,8 @@ from twisted.protocols import basic
 
 import json
 
+class CouchdbConnectionError(Exception): pass
+
 class CouchdbConnection(object):
 
     def __init__(self, database, user=None, password=None,
@@ -20,8 +22,18 @@ class CouchdbConnection(object):
 
         self.url = base_url + database
 
-    def _parse_response(self, response, expect_ok=False, accepted_codes=[200, 201]):
-        assert response.code in accepted_codes, "Error in response:{}".format(response.code)
+    def _parse_response(self, response, expect_ok=False,
+                        accepted_codes=[200, 201],
+                        _method=None, _document=None):
+
+        def render_error(err_data):
+            msg = "Error {} when trying to {} {}: {}"
+            raise CouchdbConnectionError(msg.format(response.code,
+                                                    _method, _document,
+                                                    err_data))
+
+        if response.code not in accepted_codes:
+            return response.text().addCallback(render_error)
 
         def _is_ok(content):
             assert content["ok"]
@@ -43,7 +55,10 @@ class CouchdbConnection(object):
         return kwargs
 
     def get(self, document="", **kwargs):
-        return self.raw_get(document, **kwargs).addCallback(self._parse_response)
+        return self.raw_get(document, **kwargs
+                            ).addCallback(self._parse_response,
+                                          _method="GET",
+                                          _document=document)
 
     def raw_get(self, document="", **kwargs):
         return treq.get("{}/{}".format(self.url, document),
@@ -51,21 +66,32 @@ class CouchdbConnection(object):
                         )
 
     def post(self, document="", **kwargs):
-        return self.raw_post(document, **kwargs).addCallback(self._parse_response, expect_ok=True)
+        return self.raw_post(document, **kwargs
+                             ).addCallback(self._parse_response,
+                                           expect_ok=True,
+                                           _method="POST",
+                                           _document=document)
 
     def raw_post(self, document="", **kwargs):
         return treq.post("{}/{}".format(self.url, document),
                          **self._update_kwargs(kwargs))
 
     def put(self, document="", **kwargs):
-        return self.raw_put(document, **kwargs).addCallback(self._parse_response, expect_ok=True)
+        return self.raw_put(document, **kwargs
+                            ).addCallback(self._parse_response,
+                                          expect_ok=True,
+                                          _method="PUT",
+                                          _document=document)
 
     def raw_put(self, document, **kwargs):
         return treq.put("{}/{}".format(self.url, document),
                         **self._update_kwargs(kwargs))
 
     def delete(self, document="", **kwargs):
-        return self.raw_delete(document, **kwargs).addCallback(self._parse_response)
+        return self.raw_delete(document, **kwargs
+                               ).addCallback(self._parse_response,
+                                             _method="DELETE",
+                                             _document=document)
 
     def raw_delete(self, document, **kwargs):
         return treq.delete("{}/{}".format(self.url, document),
