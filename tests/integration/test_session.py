@@ -1,5 +1,5 @@
 
-from base_mixin import ServerTestMixin
+from base_mixin import ServerTestMixin, deferred
 
 from unittest import TestCase
 
@@ -8,6 +8,7 @@ import json
 
 class TestSession(ServerTestMixin, TestCase):
 
+    @deferred(timeout=5.0)
     def test_session_creation_and_query(self):
         payload = {'username': 'michael super star',
                    "chatname": 1234}

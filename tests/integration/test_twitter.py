@@ -1,4 +1,4 @@
-from base_mixin import IntegrationTestMixin
+from base_mixin import IntegrationTestMixin, deferred
 from unittest import TestCase
 from geoffrey.services.twitter import TwitterClient
 
@@ -15,5 +15,6 @@ class TestTweet(IntegrationTestMixin, TestCase):
         self.client = TwitterClient(key, secret)
         self.tweet = os.environ.get('TWEET')
 
+    @deferred(timeout=5.0)
     def test_tweet(self):
         return self.client.post_tweet(self.tweet, '/xyz', 'new topic', persitent=False)
