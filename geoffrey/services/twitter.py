@@ -36,7 +36,7 @@ class TwitterClient(object):
         self._consumer_secret = consumer_secret
         self._api_url = api_url
 
-    def request(self, http_method, uri, payload={}):
+    def request(self, http_method, uri, payload={}, **kwargs):
         def _raise_error(txt):
             logger.info("ERROR: %s", txt)
             raise TwitterApiError(txt)
@@ -61,11 +61,11 @@ class TwitterClient(object):
                                          headers=headers, body=body)
 
         dfr = treq.request(http_method, url, headers=headers,
-                           data=body)
+                           data=body, **kwargs)
 
         return dfr.addCallback(_read_response)
 
-    def post_tweet(self, message, link, title=None):
+    def post_tweet(self, message, link, title=None, **kwargs):
         def _create_tweet(message, link, title):
             count = 120 - len(message)
             tweet = "{} {} {}".format(message, title[:count], link)
@@ -77,5 +77,4 @@ class TwitterClient(object):
             tweet = "{} {}".format(message, link)
 
         return self.request('POST', 'statuses/update',
-                            {"status": tweet.encode('utf8')})
-
+                            {"status": tweet.encode('utf8')}, **kwargs)

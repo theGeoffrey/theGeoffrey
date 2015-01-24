@@ -1,12 +1,8 @@
 from base_mixin import IntegrationTestMixin
-import logging
-from twisted.trial.unittest import TestCase
+from unittest import TestCase
 from geoffrey.services.twitter import TwitterClient
-import os
-from twisted.internet.base import DelayedCall
-DelayedCall.debug = True
 
-logger = logging.getLogger("TEST_TwitterAPI")
+import os
 
 
 class TestTweet(IntegrationTestMixin, TestCase):
@@ -20,4 +16,4 @@ class TestTweet(IntegrationTestMixin, TestCase):
         self.tweet = os.environ.get('TWEET')
 
     def test_tweet(self):
-        return self.client.post_tweet(self.tweet, '/xyz', 'new topic')
+        return self.client.post_tweet(self.tweet, '/xyz', 'new topic', persitent=False)

@@ -11,9 +11,10 @@ class CouchdbConnectionError(Exception): pass
 class CouchdbConnection(object):
 
     def __init__(self, database, user=None, password=None,
-                 base_url="http://localhost:5984"):
+                 base_url="http://localhost:5984", defaults=None):
 
         self.auth = None
+        self.defaults = defaults or dict()
         if user:
             self.auth = (user, password)
 
@@ -44,7 +45,9 @@ class CouchdbConnection(object):
             dfr.addCallback(_is_ok)
         return dfr
 
-    def _update_kwargs(self, kwargs):
+    def _update_kwargs(self, args):
+        kwargs = self.defaults.copy()
+        kwargs.update(args)
         if self.auth:
             if not 'auth' in kwargs:
                 kwargs['auth'] = self.auth
@@ -53,6 +56,14 @@ class CouchdbConnection(object):
         headers.update({'Content-Type': ['application/json']})
         kwargs['headers'] = headers
         return kwargs
+
+    def createDB(self, **kwargs):
+        return treq.put(self.url, **self._update_kwargs(kwargs)
+                        ).addCallback(self._parse_response, expect_ok=True)
+
+    def deleteDB(self, **kwargs):
+        return treq.delete(self.url, **self._update_kwargs(kwargs)
+                           ).addCallback(self._parse_response, expect_ok=True)
 
     def get(self, document="", **kwargs):
         return self.raw_get(document, **kwargs
