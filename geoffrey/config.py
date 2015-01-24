@@ -34,6 +34,9 @@ if "REDIS_URL" in os.environ:
         "CELERY_RESULT_BACKEND": "{}/1".format(redis_url)
         })
 
+if "GEOFFREY_PRODUCTION" in os.environ:
+    CONFIG["DEBUG"] = False
+
 if "COUCH_URL" in os.environ:
     couch_domain = os.environ['COUCH_URL'].split("@", 1)[1]
     couch_proto = os.environ['COUCH_URL'].split("://", 1)[0]
