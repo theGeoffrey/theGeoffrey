@@ -1,7 +1,8 @@
 import treq
 
 
-class CouchdbConnectionError(Exception): pass
+class CouchdbConnectionError(Exception):
+    pass
 
 
 class CouchdbConnection(object):
@@ -11,6 +12,7 @@ class CouchdbConnection(object):
 
         self.auth = None
         self.defaults = defaults or dict()
+        self.db_name = database
         if user:
             self.auth = (user, password)
 

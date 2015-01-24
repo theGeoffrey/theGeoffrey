@@ -9,6 +9,8 @@ COUCHDB_LOGGER_PASSWORD: test
 COUCH_USER: "geoffreybot"
 COUCH_PASSWORD: test
 
+DEFAULT_SESSION_TIMEOUT: 43200
+
 
 enabled_services: 
   - mailchimp_subscribe

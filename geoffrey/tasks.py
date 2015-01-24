@@ -8,7 +8,8 @@ from pystache import render
 from geoffrey.services import forms
 from geoffrey.services.twitter import TwitterClient
 from geoffrey.utils import get_params
-from geoffrey.helpers import with_config_environment, with_state
+from geoffrey.helpers import with_config_environment, with_state,\
+                                  get_database_connection
 from geoffrey.services import mailchimp
 from geoffrey.discourse import DiscourseClient as dc
 from geoffrey.config import CONFIG
@@ -28,6 +29,11 @@ app.conf.update(CONFIG.CELERY)
 
 #  what the?
 # serialization.registry._decoders.pop("application/x-python-serialize")
+
+
+@app.task(max_retries=1)
+def purge_document(database, document_id):
+    return get_database_connection(database).delete(document_id)
 
 
 @app.task

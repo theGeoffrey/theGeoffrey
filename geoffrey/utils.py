@@ -1,6 +1,7 @@
 from pprint import pprint
 from datetime import datetime
 
+
 class MisConfiguredError(Exception):
     pass
 
@@ -10,7 +11,14 @@ class ProgrammingError(MisConfiguredError):
 
 
 def db_now():
-    return datetime.utcnow().isoformat()
+    return db_date_format()
+
+
+def db_date_format(delta=None):
+    date = datetime.utcnow()
+    if delta:
+        date += delta
+    return date.isoformat()
 
 
 def get_params(config, *args, **kwargs):

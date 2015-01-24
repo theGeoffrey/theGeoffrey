@@ -48,9 +48,9 @@ class ServerTestMixin(IntegrationTestMixin):
     def setUpClass(cls):
         IntegrationTestMixin.setUpClass()
 
-        cls.__DB_NAME = environ.get("COUCHDB_DB", "test-geoffrey-" + uuid.uuid4().hex)
+        DB_NAME = environ.get("COUCHDB_DB", "test-geoffrey-" + uuid.uuid4().hex)
 
-        cls.__DB = DB = get_database_connection(cls.__DB_NAME,
+        cls.__DB = DB = get_database_connection(DB_NAME,
                     user=environ.get("COUCHDB_ADMIN_USER", None),
                     password=environ.get("COUCHDB_ADMIN_PW", None),
                     base_url=environ.get("COUCHDB_BASE_URL", None),
@@ -66,12 +66,15 @@ class ServerTestMixin(IntegrationTestMixin):
     def tearDownClass(cls):
         return cls.__DB.deleteDB()
 
-    def _get_api_key(self):
+    def get_api_key(self):
         return "{}:{}@{}".format(self.__class__.__DB.auth[0],
-                                 self.__class__.__DB.auth[1], self.__class__.__DB_NAME)
+                                 self.__class__.__DB.auth[1], self.__class__.__DB.db_name)
 
-    def _get_public_key(self):
-        return self.__class__.__DB_NAME
+    def get_public_key(self):
+        return self.__class__.__DB.db_name
+
+    def get_document(self, document):
+        return self.__class__.__DB.get(document)
 
     def _make_request(self, path, method='GET', _is_json=False,
                       _append_public_key=False, _append_api_key=False,
@@ -81,10 +84,10 @@ class ServerTestMixin(IntegrationTestMixin):
 
         url = environ['GEOFFREY_URL'] + path
         if _append_public_key:
-            params['publickey'] = self._get_public_key()
+            params['publickey'] = self.get_public_key()
 
         if _append_api_key:
-            params['key'] = self._get_api_key()
+            params['key'] = self.get_api_key()
 
         def read_stream(response):
             self.assertIn(response.code, _accepted_codes,

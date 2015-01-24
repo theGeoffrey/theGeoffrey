@@ -2,14 +2,16 @@
 from twisted.internet import defer
 from twisted.python import log
 
-from werkzeug.exceptions import Unauthorized
+from datetime import timedelta
+
+from werkzeug.exceptions import Unauthorized, BadRequest
 
 from klein import Klein
 
 from geoffrey import __version__
 from geoffrey.config import CONFIG
 from geoffrey.helpers import get_database_connection, get_request_param
-from geoffrey.utils import get_active_services_for_api, db_now
+from geoffrey.utils import get_active_services_for_api, db_now, db_date_format
 from geoffrey import tasks
 
 import json
@@ -133,10 +135,37 @@ for item in ["post", "topic", "user"]:
 @app.secure
 def create_session(request):
     payload = json.loads(request.content.read())
+
+    if not "username" in payload:
+        raise BadRequest("You need to provide a username")
+
+    if "_id" in payload:
+        raise BadRequest("'_id' is not allowed in paylod")
+
     payload['type'] = 'session'
     payload['created'] = db_now()
-    return request.db_client.post(data=json.dumps(payload)
-            ).addCallback(lambda x: json.dumps({"success": True, "id": x['id']}))
+
+    schedule_deletion = False
+
+    if payload.get("permanent", None):
+        payload.pop("timeout", None)
+        payload.pop("valid_until", None)
+    else:
+        timeout = payload.pop("timeout", CONFIG.DEFAULT_SESSION_TIMEOUT)
+        payload['valid_until'] = db_date_format(timedelta(seconds=timeout))
+
+    dfr = request.db_client.post(data=json.dumps(payload))
+
+    def schedule_delete(session):
+        tasks.purge_document.apply_async(
+                (request.db_client.db_name, session["_id"]),
+                countdown=timeout)
+        return session
+
+    if schedule_deletion:
+        dfr.addCallback(schedule_delete)
+
+    return dfr.addCallback(lambda x: json.dumps({"success": True, "id": x['id']}))
 
 
 @app.route('/session/<public_key>/<session>/confirm/')
