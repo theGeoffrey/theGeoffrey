@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+
+from werkzeug.exceptions import Unauthorized
+
+
 from geoffrey.config import CONFIG
 from geoffrey.couchdb_connection import CouchdbConnection
 
@@ -10,10 +15,34 @@ def get_db_master_config():
                 url="http://" + CONFIG.COUCHDB_DOMAIN)
 
 
-def get_database_connection(db, user=None, password=None, base_url=None):
+def get_database_connection(db, user=None, password=None, base_url=None, **kwargs):
     return CouchdbConnection(db, user=user or CONFIG.COUCH_USER,
                              password=password or CONFIG.COUCH_PASSWORD,
-                             base_url=base_url or "http://" + CONFIG.COUCHDB_DOMAIN)
+                             base_url=base_url or "http://" + CONFIG.COUCHDB_DOMAIN,
+                             **kwargs)
+
+
+def get_request_param(key_name, request, kwargs):
+    """
+    Find the requested `key_name` looking in this order in
+    kwargs, request.args and – if the method is POST or PUT – in request.form .
+
+    If not found, raises Unauthorized()-Error
+
+    Returns the value for the key by they first found
+    """
+
+    value = None
+    if key_name in kwargs:
+        value = kwargs[key_name]
+    elif key_name in request.args:
+        value = request.args[key_name][0]
+    elif request.method in ['POST', 'PUT'] and key_name in request.form:
+        value = request.form[key_name][0]
+
+    if value is None:
+        raise Unauthorized()
+    return value
 
 
 # Decorators

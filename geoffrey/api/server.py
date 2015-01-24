@@ -8,7 +8,7 @@ from klein import Klein
 
 from geoffrey import __version__
 from geoffrey.config import CONFIG
-from geoffrey.helpers import get_database_connection
+from geoffrey.helpers import get_database_connection, get_request_param
 from geoffrey.utils import get_active_services_for_api, db_now
 from geoffrey.services import chat
 from geoffrey import tasks
@@ -59,22 +59,9 @@ class GeoffreyApi(Klein):
     def _get_by_public_key(self, request, pkey):
         return self._get_config(request, pkey)
 
-    def _get_param(self, key_name, request, kwargs):
-        value = None
-        if key_name in kwargs:
-            value = kwargs[key_name]
-        elif key_name in request.args:
-            value = request.args[key_name][0]
-        elif request.method in ['POST', 'PUT'] and key_name in request.form:
-            value = request.form[key_name][0]
-
-        if value is None:
-            raise Unauthorized()
-        return value
-
     def secure(self, func):
         def secured(request, **kwargs):
-            key = self._get_param('key', request, kwargs)
+            key = get_request_param('key', request, kwargs)
             return self._get_by_api_key(request, key
                 ).addCallback(func, **kwargs)
         secured.func_name = func.func_name
@@ -82,7 +69,7 @@ class GeoffreyApi(Klein):
 
     def public(self, func):
         def secured_public(request, **kwargs):
-            key = self._get_param('public_key', request, kwargs)
+            key = get_request_param('public_key', request, kwargs)
             return self._get_by_public_key(request, key
                     ).addCallback(func, **kwargs)
         secured_public.func_name = func.func_name
@@ -96,7 +83,7 @@ class GeoffreyApi(Klein):
                 request.session = session_data
                 return request
 
-            key = self._get_param('session', request, kwargs)
+            key = get_request_param('session', request, kwargs)
             return request.db_client.get(key
                        ).addCallback(set_session
                        ).addCallback(func, **kwargs)
@@ -181,7 +168,7 @@ def embed_config(request):
 @app.route('/ping')
 @app.secure
 def ping(request):
-    return 'Your API key is:{}'.format(request.config['dc_url'])
+    return 'Your Domain is:{}'.format(request.config['dc_url'])
 
 
 @app.route('/version')
