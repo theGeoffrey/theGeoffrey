@@ -1,4 +1,4 @@
-from pprint import pprint
+
 from datetime import datetime
 
 
@@ -19,6 +19,10 @@ def db_date_format(delta=None):
     if delta:
         date += delta
     return date.isoformat()
+
+
+def db_date_parse(datetimestring):
+    return datetime.strptime(datetimestring, "%Y-%m-%dT%H:%M:%S.%f")
 
 
 def get_params(config, *args, **kwargs):
@@ -67,5 +71,3 @@ def get_active_services_for_api(config, api_call, module):
 
         if api_call in func.reacts_on_api_calls:
             yield func
-
-

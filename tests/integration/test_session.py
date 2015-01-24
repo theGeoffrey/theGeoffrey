@@ -46,7 +46,8 @@ class TestSession(ServerTestMixin, TestCase):
 
     @deferred(timeout=5.0)
     def test_session_permanent_creation_and_query(self):
-        payload = {'username': 'michael@two', "permanent": True, "chatname": 1234}
+        payload = {'username': 'michael@two',
+                   "permanent": True, "chatname": 1234}
 
         def confirm_true(res):
             self.assertEquals(res, "true")
@@ -100,3 +101,32 @@ class TestSession(ServerTestMixin, TestCase):
                                   _accepted_codes=[400],
                                   # we expect a 400 Error
                                   _is_json=False, _append_api_key=True)
+
+
+    @deferred(timeout=5.0)
+    def test_outdated_session_fails_properly(self):
+        payload = {'username': 'michael@two', 'timeout': -1}
+        # times out before now.
+
+        def confirm(session_id):
+            url = '/session/{}/{}/confirm'
+
+            return self._make_request(url.format(self.get_public_key(),
+                                                 session_id), params=payload,
+                                      _accepted_codes=[404]
+                                      # Expecting it to not be found.
+                                      )
+
+        def check(result):
+            self.assertEquals(result['success'], True)
+            self.assertIn("id", result)
+
+            return result['id']
+
+        dfr = self._make_request('/session/create?',
+                                 method='POST',
+                                 data=json.dumps(payload),
+                                 _is_json=True, _append_api_key=True)
+        dfr.addCallback(check)
+        dfr.addCallback(confirm)
+        return dfr

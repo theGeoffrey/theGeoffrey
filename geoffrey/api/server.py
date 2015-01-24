@@ -2,16 +2,17 @@
 from twisted.internet import defer
 from twisted.python import log
 
-from datetime import timedelta
+from datetime import timedelta, datetime
 
-from werkzeug.exceptions import Unauthorized, BadRequest
+from werkzeug.exceptions import Unauthorized, BadRequest, NotFound
 
 from klein import Klein
 
 from geoffrey import __version__
 from geoffrey.config import CONFIG
 from geoffrey.helpers import get_database_connection, get_request_param
-from geoffrey.utils import get_active_services_for_api, db_now, db_date_format
+from geoffrey.utils import (get_active_services_for_api, db_now,
+                            db_date_format, db_date_parse)
 from geoffrey import tasks
 
 import json
@@ -81,7 +82,9 @@ class GeoffreyApi(Klein):
 
         def loading_session(request, **kwargs):
             def set_session(session_data):
-                # FIXME: this should be one-time tokens, too
+                if not session_data.get("permanent", False) and \
+                        datetime.utcnow() > db_date_parse(session_data["valid_until"]):
+                    raise NotFound()
                 request.session = session_data
                 return request
 
