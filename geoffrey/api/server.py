@@ -10,12 +10,12 @@ from geoffrey import __version__
 from geoffrey.config import CONFIG
 from geoffrey.helpers import get_database_connection, get_request_param
 from geoffrey.utils import get_active_services_for_api, db_now
-from geoffrey.services import chat
 from geoffrey import tasks
 
 import json
 
 SUCCESS = '{"success": true}'
+FAILURE = '{"success": false}'
 
 
 def auth_wrapper(func):
@@ -136,14 +136,19 @@ def create_session(request):
     payload['type'] = 'session'
     payload['created'] = db_now()
     return request.db_client.post(data=json.dumps(payload)
-            ).addCallback(lambda x: json.dumps(x))
+            ).addCallback(lambda x: json.dumps({"success": True, "id": x['id']}))
 
 
-@app.route('/apps/chat/<public_key>/<session>/', branch=True)
+@app.route('/session/<public_key>/<session>/confirm/<key>/<value>')
 @app.public
 @app.with_session
-def chat_receive(request, **kwargs):
-    return chat.receiver(request)
+def confirm_session_pair(request, **kwargs):
+    key = get_request_param('key', request, kwargs)
+    value = get_request_param('value', request, kwargs)
+
+    if request.session.get(key, None) == value:
+        return 'true'
+    return 'false'
 
 
 @app.route('/forms/add', methods=['POST'])
