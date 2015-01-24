@@ -17,10 +17,10 @@ class TestSession(ServerTestMixin, TestCase):
             self.assertEquals(res, "true")
 
         def confirm(session_id):
-            url = '/session/{}/{}/confirm/username/michael%20super%20star'
+            url = '/session/{}/{}/confirm'
 
             return self._make_request(url.format(self._get_public_key(),
-                                                 session_id)
+                                                 session_id), params=payload
                                       ).addCallback(confirm_true)
 
         def check(result):

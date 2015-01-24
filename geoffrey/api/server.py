@@ -139,16 +139,17 @@ def create_session(request):
             ).addCallback(lambda x: json.dumps({"success": True, "id": x['id']}))
 
 
-@app.route('/session/<public_key>/<session>/confirm/<key>/<value>')
+@app.route('/session/<public_key>/<session>/confirm/')
 @app.public
 @app.with_session
 def confirm_session_pair(request, **kwargs):
-    key = get_request_param('key', request, kwargs)
-    value = get_request_param('value', request, kwargs)
-
-    if request.session.get(key, None) == value:
-        return 'true'
-    return 'false'
+    for key, value in request.args.iteritems():
+        if request.session.get(key, None) != value:
+            break
+    else:
+        # none broke, we are good to return true
+        return "true"
+    return "false"
 
 
 @app.route('/forms/add', methods=['POST'])
