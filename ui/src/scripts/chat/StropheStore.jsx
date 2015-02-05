@@ -36,9 +36,7 @@ function onMessage(msg) {
 }
 
 function init(service, server){
-    console.log("GO GO GO");
     connection = new Strophe.Connection(service || BOSH_SERVICE);
-    console.log("GO GO GO");
     // connection.rawInput = rawInput;
     // connection.rawOutput = rawOutput;
     connection.connect(server || "chat.thegeoffrey.co", null, function onConnect(status, reason) {

@@ -19,6 +19,16 @@ var React = require('react/addons'),
 // CSS
 require('../styles/chat.less');
 
+var ChatToggle = React.createClass({
+  render: function(){
+    return (<i onClick={this.toggle} className="fa fa-comments-o"></i>)
+  },
+  toggle: function(evt){
+    this.props.toggle();
+    return false;
+  },
+});
+
 var ChatApp = React.createClass({
 
   componentWillMount: function() {
@@ -28,6 +38,11 @@ var ChatApp = React.createClass({
         this.setState({loading: false, jid: evt.payload.jid})
       }
     }.bind(this));
+
+    // injecting in ember, oh, we are snarky!
+    $(".d-header ul[role='navigation']").prepend($('<li id="gfr-chat-toggle"></li>'));
+    React.render(<ChatToggle toggle={this._toggleWindow} />,
+        document.getElementById('gfr-chat-toggle'));
   },
   componentDidMount: function(){
     initConnection();
@@ -39,14 +54,26 @@ var ChatApp = React.createClass({
   },
 
   getInitialState: function(){
-    return {'loading': true, "jid": false};
+    return {'loading': true, "jid": false, open: true};
+  },
+
+  _toggleWindow: function(){
+    this.setState({open: !this.state.open});
   },
 
   render: function() {
-    if (this.state.loading){
-      return (<p>loading chat</p>);
+    var content = (<p>loading chat</p>),
+        clsname = "chat " + (this.state.open ? "open" : "");
+    if (!this.state.loading){
+      content = (<p>Chat enabled. Talk to {this.state.jid}</p>);
     }
-    return (<p>Chat enabled. Talk to {this.state.jid}</p>);
+
+    return (<div className={clsname}>
+              <div className="chat-window">
+                {content}
+                <button onClick={this._toggleWindow} className='btn btn-primary'>close window</button>
+              </div>
+            </div>);
   }
 });
 
