@@ -1,8 +1,12 @@
-from base_mixin import IntegrationTestMixin, deferred
-from unittest import TestCase
+from base_mixin import IntegrationTestMixin
+import logging
+from twisted.trial.unittest import TestCase
 from geoffrey.services.twitter import TwitterClient
-
 import os
+from twisted.internet.base import DelayedCall
+DelayedCall.debug = True
+
+logger = logging.getLogger("TEST_TwitterAPI")
 
 
 class TestTweet(IntegrationTestMixin, TestCase):
@@ -15,10 +19,8 @@ class TestTweet(IntegrationTestMixin, TestCase):
         self.client = TwitterClient(key, secret)
         self.tweet = os.environ.get('TWEET')
 
-    @deferred(timeout=5.0)
     def test_tweet(self):
-        return self.client.post_tweet(self.tweet, '/xyz', 'new topic', persistent=False)
-
+        return self.client.post_tweet(self.tweet, '/xyz', 'new topic')
 
     # @classmethod
     # def tearDownClass(cls):
@@ -37,4 +39,5 @@ class TestMentions(IntegrationTestMixin, TestCase):
 
     def test_mention(self):
         return self.client.get_mentions(self.count)
+
 

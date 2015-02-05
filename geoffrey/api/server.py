@@ -98,7 +98,7 @@ class GeoffreyApi(Klein):
     def _api_trigger_wrapper(self, name):
         def _wrapped(request):
 
-            payload = json.loads(request.content.read())
+            payload = json.loads(request.content.read()) if request.content else None
 
             for func in get_active_services_for_api(request.config, name, tasks):
                 func.delay(request.config, payload)
@@ -115,6 +115,11 @@ class GeoffreyApi(Klein):
 
         self.route('/trigger/{}/update'.format(item), methods=["POST"])(
             self._api_trigger_wrapper("{}_update".format(item)))
+
+    def trigger_scheduler_route(self, item):
+
+        self.route('/trigger/{}/schedule'.format(item), methods=["GET"])(
+            self._api_trigger_wrapper("{}_schedule".format(item)))
 
     def get_server_settings(self):
         settings = {"capabilities": {},
@@ -133,6 +138,8 @@ app = GeoffreyApi()
 for item in ["post", "topic", "user"]:
     app.trigger_route(item)
 
+for item in ["1h", "24h"]:
+    app.trigger_scheduler_route(item)
 
 @app.route('/session/create', methods=["POST"])
 @app.secure

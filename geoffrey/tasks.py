@@ -1,4 +1,5 @@
 from twisted.internet import reactor
+from eventlet.twistedutil import join_reactor, callInGreenThread
 from celery import Celery
 from txcelery.defer import CeleryClient
 from twisted.internet import defer
@@ -7,33 +8,22 @@ from pystache import render
 # from pprint import pprint
 from geoffrey.services import forms
 from geoffrey.services.twitter import TwitterClient
+from geoffrey import config
 from geoffrey.utils import get_params
-from geoffrey.helpers import with_config_environment, with_state,\
-                                  get_database_connection
 from geoffrey.services import mailchimp
 from geoffrey.discourse import DiscourseClient as dc
-from geoffrey.config import CONFIG
-
 from celery.bin.worker import worker
 import logging
-
-# import eventlet
+import eventlet
 from kombu import serialization
 
 logger = logging.getLogger("Tasks")
 
-# eventlet.hubs.use_hub('twistedr')
+eventlet.hubs.use_hub('twistedr')
 
 app = Celery('tasks')
-app.conf.update(CONFIG.CELERY)
-
-#  what the?
-# serialization.registry._decoders.pop("application/x-python-serialize")
-
-
-@app.task(max_retries=1)
-def purge_document(database, document_id):
-    return get_database_connection(database).delete(document_id)
+app.conf.update(config.CONFIG.CELERY)
+serialization.registry._decoders.pop("application/x-python-serialize")
 
 
 @app.task
@@ -99,9 +89,25 @@ def tweet_topic(app_config, payload):
     return dfr
 
 
+@app.task
+def get_twitter_mentions(app_config, payload=None):
+    key, secret = get_params(app_config, 'twitter.t_token',
+                             'twitter.t_secret')
+    client = TwitterClient(key, secret)
+
+    dfr = client.get_mentions()
+    dfr.addErrback(log.err)
+    return dfr
+
+
+
+def 
+
+
 mailchimp_subscribe.reacts_on_api_calls = ["user_new"]
 mailchimp_batch_subscribe.reacts_on_api_calls = ["add_batch"]
 post_form.reacts_on_api_calls = ["form_new"]
 tweet_topic.reacts_on_api_calls = ["topic_new"]
 tweet_topic.reacts_on_api_calls = ["post_new"]
+get_twitter_mentions.reacts_on_api_calls = ["24h_schedule"]
 
