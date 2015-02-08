@@ -44,23 +44,29 @@ var ChatApp = React.createClass({
     $(".d-header ul[role='navigation']").prepend($('<li id="gfr-chat-toggle"></li>'));
     React.render(<ChatToggle toggle={this._toggleWindow} />,
         document.getElementById('gfr-chat-toggle'));
+
+    console.log(this.props);
+
+    if (this.props.user){
+      var username = this.props.user.username.toLowerCase();
+      $.getJSON("/geoffrey/session.json").then(function(res){
+        console.log(res);
+        initConnection(null, null, username, res.id);
+      })
+    } else {
+      initConnection();
+    }
   },
   componentDidMount: function(){
     messageStore.on("all", function(){
       console.log("ALL");
       this.refreshData();
     }.bind(this))
-    initConnection();
 
   },
 
   refreshData: function(){
     this.setState({"messages": messageStore});
-  },
-
-  getEndpoint: function(){
-    return 'http://chat.thegeoffrey.co/http-bind/';
-    // return this.props.config.chat.endpoint
   },
 
   getInitialState: function(){

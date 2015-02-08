@@ -32,9 +32,30 @@ module.exports = {
         });
     },
 
+    authenticating: function(payload) {
+        return ChatDispatcher.dispatch({
+            actionType: 'authenticating',
+            payload: payload
+        });
+    },
+
+    authFailed: function(payload) {
+        return ChatDispatcher.dispatch({
+            actionType: 'authFailed',
+            payload: payload
+        });
+    },
+
     connFailed: function(payload) {
         return ChatDispatcher.dispatch({
             actionType: 'connFailed',
+            payload: payload
+        });
+    },
+
+    attached: function(payload) {
+        return ChatDispatcher.dispatch({
+            actionType: 'attached',
             payload: payload
         });
     },

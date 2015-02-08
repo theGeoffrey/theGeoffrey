@@ -17,9 +17,9 @@ var EmbedApp = React.createClass({
                     return x.shouldBeLoaded.apply(me);
                 }).map(function(x){
                     var component = x.component;
-                    return (<component user={me.user}
-                                       settings={me.settings}
-                                       config={me.config} />)
+                    return (<component user={me.props.user}
+                                       settings={me.props.settings}
+                                       config={me.props.config} />)
                 });
         console.log(components);
         return <div>{components}</div>;
@@ -40,7 +40,7 @@ var EmbedApp = React.createClass({
 
     function __startGeoffrey(config){
         var baseDiv = document.createElement("div"),
-            user =Discourse.User.current(),
+            user = Discourse.User.current(),
             settings = Discourse.SiteSettings;
 
         // setup and add to DOM

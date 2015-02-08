@@ -6,7 +6,7 @@ var strph = require("strophe"), // becomes "window.Strophe"
     muc = require("strophe-plugins/muc"), // Multi User Chat
     actions = require("./actions"),
     dispatcher = require("./dispatcher"),
-    BOSH_SERVICE = 'http://chat.thegeoffrey.co/http-bind/',
+    BOSH_SERVICE = 'ws://chat.thegeoffrey.co/ws-xmpp/',
     connection = null,
     // wrapping strophe ....
     Strophe = window.Strophe,
@@ -38,19 +38,42 @@ function onMessage(msg) {
     return true;
 }
 
-function init(service, server){
+function init(service, server, username, session_id){
     connection = new Strophe.Connection(service || BOSH_SERVICE);
     // connection.rawInput = rawInput;
     // connection.rawOutput = rawOutput;
-    connection.connect(server || "chat.thegeoffrey.co", null, function onConnect(status, reason) {
+    var password = null,
+        jid = server || "chat.thegeoffrey.co";
+
+    if (username){
+        jid = username + "@" + jid;
+        password = session_id
+    }
+
+    console.log(jid, username, password, session_id);
+
+    connection.connect(jid, session_id,
+        function onConnect(status, reason) {
 
         if (status == Strophe.Status.CONNECTING) {
            log('Strophe is connecting.');
            actions.connecting();
 
+        } else if (status == Strophe.Status.AUTHENTICATING) {
+           log('Strophe authenticating...', arguments);
+           actions.authenticating();
+
+        } else if (status == Strophe.Status.ATTACHED) {
+           log('Strophe attached...', arguments);
+           actions.attached({reason: reason});
+
+        } else if (status == Strophe.Status.AUTHFAIL) {
+           log('Strophe authenticating... failed', arguments);
+           actions.authFailed({reason: reason});
+
         } else if (status == Strophe.Status.CONNFAIL) {
-           log('Strophe failed to connect.');
-           actions.connFailed();
+           log('Strophe failed to connect.', arguments);
+           actions.connFailed({reason: reason});
 
         } else if (status == Strophe.Status.DISCONNECTING) {
            log('Strophe is disconnecting.');
@@ -83,7 +106,7 @@ function query_archive_for_user(connection, target){
 
 function query_roster(connection){
     connection.roster.get(function(){
-        console.log(arguments, connection.roster.items);
+        console.log("roster received", arguments, connection.roster.items);
         actions.rosterChanged(connection.roster.items);
     });
 }
