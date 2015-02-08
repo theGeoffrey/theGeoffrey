@@ -20,8 +20,8 @@ function log(){
 function onMessage(msg) {
     log(msg);
     var payload = {
-            to: msg.getAttribute('to'),
-            from: msg.getAttribute('from')
+            to: Strophe.getBareJidFromJid(msg.getAttribute('to')),
+            from: Strophe.getBareJidFromJid(msg.getAttribute('from'))
         },
         type = msg.getAttribute('type'),
         elems = msg.getElementsByTagName('body');
@@ -111,6 +111,10 @@ function query_roster(connection){
     });
 }
 
+function whoami(){
+    return Strophe.getBareJidFromJid(connection.jid);
+}
+
 dispatcher.register(function(evt) {
     switch(evt.actionType){
         case 'connected':
@@ -130,4 +134,4 @@ dispatcher.register(function(evt) {
     }
 });
 
-module.exports = init;
+module.exports = {init: init, whoami: whoami};

@@ -1,82 +1,29 @@
 
-var ChatDispatcher = require('./dispatcher');
+var ChatDispatcher = require('./dispatcher'),
+    _ = require("underscore"),
+    actions = {};
 
-module.exports = {
+_.each([
     // messages
-    sendMessage: function(payload) {
-        return ChatDispatcher.dispatch({
-            actionType: 'sendMessage',
-            payload: payload
-        });
-    },
-    receiveMessage: function(payload) {
-        return ChatDispatcher.dispatch({
-            actionType: 'receiveMessage',
-            payload: payload
-        });
-    },
+    "sendMessage", "receiveMessage",
 
-    // roster stuff
-    rosterChanged: function(roster){
-        return ChatDispatcher.dispatch({
-            actionType: 'connecting',
-            payload: {items: roster}
-        });
-    },
+    // conversations
+    "startConversation",
+
+    // roster
+    "rosterChanged",
+
     // connectivity
+    "connecting", "authenticating", "authFailed", "connFailed",
+    "attached", "disconnecting", "disconnected", "connected"
+    ],
+    function(name){
+    actions[name] = function(payload){
+        return ChatDispatcher.dispatch({
+            actionType: name,
+            payload: payload
+        });
+    }
+});
 
-    connecting: function(payload) {
-        return ChatDispatcher.dispatch({
-            actionType: 'connecting',
-            payload: payload
-        });
-    },
-
-    authenticating: function(payload) {
-        return ChatDispatcher.dispatch({
-            actionType: 'authenticating',
-            payload: payload
-        });
-    },
-
-    authFailed: function(payload) {
-        return ChatDispatcher.dispatch({
-            actionType: 'authFailed',
-            payload: payload
-        });
-    },
-
-    connFailed: function(payload) {
-        return ChatDispatcher.dispatch({
-            actionType: 'connFailed',
-            payload: payload
-        });
-    },
-
-    attached: function(payload) {
-        return ChatDispatcher.dispatch({
-            actionType: 'attached',
-            payload: payload
-        });
-    },
-
-    disconnecting: function(payload) {
-        return ChatDispatcher.dispatch({
-            actionType: 'disconnecting',
-            payload: payload
-        });
-    },
-    disconnected: function(payload) {
-        return ChatDispatcher.dispatch({
-            actionType: 'disconnected',
-            payload: payload
-        });
-    },
-
-    connected: function(payload) {
-        return ChatDispatcher.dispatch({
-            actionType: 'connected',
-            payload: payload
-        });
-    },
-}
+module.exports = actions;
