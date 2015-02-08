@@ -1,6 +1,9 @@
 'use strict';
 
-var strph = require("strophe"),
+var strph = require("strophe"), // becomes "window.Strophe"
+    mam = require("strophe-plugins/mam"), // Message Archive Management Protocol
+    roster = require("strophe-plugins/roster"), // Roster Management
+    muc = require("strophe-plugins/muc"), // Multi User Chat
     actions = require("./actions"),
     dispatcher = require("./dispatcher"),
     BOSH_SERVICE = 'http://chat.thegeoffrey.co/http-bind/',
@@ -64,11 +67,36 @@ function init(service, server){
     });
 };
 
+function query_archive_for_user(connection, target){
+    connection.mam.query(connection.jid, {
+      "with": target,
+      onMessage: function(message) {
+        console.log(message);
+        actions.receiveMessage(message);
+        return true;
+      },
+      onComplete: function(response) {
+                console.log("Got all the messages with " + target);
+      }
+    });
+}
+
+function query_roster(connection){
+    connection.roster.get(function(){
+        console.log(arguments, connection.roster.items);
+        actions.rosterChanged(connection.roster.items);
+    });
+}
+
 dispatcher.register(function(evt) {
     switch(evt.actionType){
         case 'connected':
             connection.addHandler(onMessage, null, 'message', null, null,  null);
+            // set presence to there
             connection.send($pres().tree());
+            // query the roster, will query the archive
+            query_roster(connection);
+
         break;
         case 'sendMessage':
             var payload = evt.payload,

@@ -15,6 +15,14 @@ module.exports = {
             payload: payload
         });
     },
+
+    // roster stuff
+    rosterChanged: function(roster){
+        return ChatDispatcher.dispatch({
+            actionType: 'connecting',
+            payload: {items: roster}
+        });
+    },
     // connectivity
 
     connecting: function(payload) {
