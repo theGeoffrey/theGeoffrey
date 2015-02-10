@@ -183,7 +183,8 @@ var ChatApp = React.createClass({
         selectedConv = conversationStore.get(this.state.selectedConv),
         content = selectedConv ? (<Conversation
                                     conversation={selectedConv} />) : (<p>please select a conversation</p>);
-        convTabs = (<TabbedArea defaultActiveKey={0} onSelect={this.handleSelectConv}>
+        convTabs = (<TabbedArea activeKey={this.state.selectedConv}
+                                onSelect={this.handleSelectConv}>
                     {tabs}
                   </TabbedArea>);
         console.log(selectedConv, this.state.selectedConv);
