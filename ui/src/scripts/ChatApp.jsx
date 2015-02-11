@@ -46,7 +46,7 @@ var Conversation = React.createClass({
   },
   componentDidMount: function(){
     this.props.conversation.on("all", function() {
-      this.setState({});
+      this.forceUpdate();
     }.bind(this));
   },
   render: function(){
