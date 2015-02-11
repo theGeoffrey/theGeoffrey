@@ -11,10 +11,13 @@ var React = require('react/addons'),
     messageStore = require('./chat/MessageStore'),
     conversationStore = require('./chat/ConversationStore'),
     dispatcher = require('./chat/dispatcher'),
+    IconStateButton = require('./components/ChatConnectionState').IconStateButton,
     queryString = require('query-string'),
     rtbs = require('react-bootstrap'),
     actions = require('./chat/actions'),
     Button = rtbs.Button,
+    DropdownButton = rtbs.DropdownButton,
+    MenuItem = rtbs.MenuItem,
     TabbedArea = rtbs.TabbedArea,
     TabPane = rtbs.TabPane,
     Input = rtbs.Input,
@@ -113,6 +116,7 @@ var NewConv = React.createClass({
                   placeholder="username"
                   type="text"
                   ref="jid"
+                  buttonBefore={<IconStateButton />}
                   buttonAfter={<Button type="submit"><Glyphicon glyph="plus" /></Button>} />
             </form></div>)
   },
@@ -168,7 +172,7 @@ var ChatApp = React.createClass({
 
   render: function() {
     var content = (<p>loading chat</p>),
-        convTabs = null;
+        convTabs = null,
         clsname = "chat " + (this.state.open ? "open" : "");
     if (!this.state.loading){
       if (conversationStore.length === 0 ){
