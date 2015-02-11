@@ -20,15 +20,14 @@ collection = new MessageCollection();
 dispatcher.register(function(evt) {
     switch(evt.actionType){
         case 'sendMessage':
-        console.log(evt.payload);
-        collection.add(evt.payload);
-        break
-    }
-    switch(evt.actionType){
+            console.log(evt.payload);
+            collection.add(evt.payload);
+        break;
+
         case 'receiveMessage':
-        console.log(evt.payload);
-        collection.add(evt.payload);
-        break
+            console.log(evt.payload);
+            collection.add(evt.payload);
+        break;
     }
 });
 
