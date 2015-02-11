@@ -50,7 +50,7 @@ module.exports = {
     }],
     loaders: [{
       test: /\.jsx$/,
-      loader: 'react-hot!jsx-loader?harmony'
+      loader: 'jsx-loader?harmony'
     }, {
       test: /\.less/,
       loader: 'style-loader!css-loader!less-loader'

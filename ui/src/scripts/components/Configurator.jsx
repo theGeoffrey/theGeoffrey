@@ -9,6 +9,7 @@ var React = require('react/addons'),
     AddApp = require('./AddApp'),
     AppPage = require('./AppPage'),
     Locations = Router.Locations,
+    MainConfig = require('./MainConfig')
     Location = Router.Location;
 
 

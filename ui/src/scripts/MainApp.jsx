@@ -22,7 +22,7 @@ var React = require('react/addons'),
     hasDB = require("./stores/_db.js").hasDB,
     Location = Router.Location,
     Locations = Router.Locations,
-    config = Config = require('./stores/Config');
+    config = require('./stores/Config'),
     OAuth = window.OAuth,
     MainConfig = require('./components/MainConfig');
 
