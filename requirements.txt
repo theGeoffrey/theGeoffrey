@@ -27,8 +27,6 @@ service-identity==14.0.0
 six==1.8.0
 treq==0.2.1
 txCelery==1.0.1
-txsockjs==1.2.2
-wallaby-backend-couchdb==0.1.39
-wallaby-backend-http==0.1.2
+txDiscourse==0.1.2
 wsgiref==0.1.2
 zope.interface==4.1.1

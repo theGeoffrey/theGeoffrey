@@ -25,8 +25,6 @@ module.exports = {
               './src/scripts/MainApp.jsx'],
           'dc-embed': [
               'webpack/hot/only-dev-server',
-              // '!bootstrap-webpack!./bootstrap.config.js',
-              // 'font-awesome-webpack!./font-awesome.config.js',
               './src/scripts/DcEmbed.jsx'],
           'forms': [
               'webpack/hot/only-dev-server',
@@ -68,7 +66,7 @@ module.exports = {
       loader: "url-loader?limit=10000&minetype=image/gif"
     },
     {
-      test: /\.woff(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+      test: /\.woff([0-9]*)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
       loader: "url-loader?limit=10000&minetype=application/font-woff"
     },
     {

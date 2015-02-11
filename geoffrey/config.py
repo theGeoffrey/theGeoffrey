@@ -1,6 +1,8 @@
 from geoffrey.utils import get_params
 from geoffrey.couchdb_connection import CouchdbConnection
 
+from urlparse import urlparse
+
 import yaml
 import os
 
@@ -38,9 +40,19 @@ if "GEOFFREY_PRODUCTION" in os.environ:
     CONFIG["DEBUG"] = False
 
 if "COUCH_URL" in os.environ:
-    couch_domain = os.environ['COUCH_URL'].split("@", 1)[1]
-    couch_proto = os.environ['COUCH_URL'].split("://", 1)[0]
-    if couch_domain:
-        CONFIG['COUCHDB_DOMAIN'] = couch_domain
-    if couch_proto:
-        CONFIG['COUCH_PROTO'] = couch_proto
+    couch_url = urlparse(os.environ['COUCH_URL'])
+
+    CONFIG['COUCH_PROTO'] = couch_url.scheme
+    CONFIG['COUCHDB_DOMAIN'] = "{}:{}".format(couch_url.hostname,
+                                              couch_url.port or 5984)
+    if couch_url.username:
+        CONFIG['COUCHDB_LOGGER_USER'] = CONFIG['COUCH_USER'] = couch_url.username
+
+    if couch_url.password:
+        CONFIG['COUCHDB_LOGGER_PASSWORD'] = CONFIG['COUCH_PASSWORD'] = couch_url.password
+
+
+if CONFIG["DEBUG"]:
+    from pprint import pprint
+    print("LOADED CONFIG:")
+    pprint(CONFIG)

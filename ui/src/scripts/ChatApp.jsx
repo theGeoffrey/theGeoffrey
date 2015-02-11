@@ -5,11 +5,20 @@
 'use strict';
 
 var React = require('react/addons'),
+    stropheStore = require('./chat/StropheStore'),
+    initConnection = stropheStore.init,
+    whoami = stropheStore.whoami,
+    messageStore = require('./chat/MessageStore'),
+    conversationStore = require('./chat/ConversationStore'),
+    dispatcher = require('./chat/dispatcher'),
     queryString = require('query-string'),
-    SockJS = require('sockjs-client'),
     rtbs = require('react-bootstrap'),
+    actions = require('./chat/actions'),
     Button = rtbs.Button,
+    TabbedArea = rtbs.TabbedArea,
+    TabPane = rtbs.TabPane,
     Input = rtbs.Input,
+    Glyphicon = rtbs.Glyphicon,
     Link = require('react-router-component').Link;
 
 // Export React so the devtools can find it
@@ -18,65 +27,192 @@ var React = require('react/addons'),
 // CSS
 require('../styles/chat.less');
 
-var ChatApp = React.createClass({
-
-
-  componentDidMount: function(){
-    var parsed = queryString.parse(location.search);
-    if (!parsed.public_key){
-      alert('No Public Key defined. Defunc!');
-      return
-    }
-    if (!parsed.session){
-      alert('No session defined. Defunc!');
-      return
-    }
-
-
-    var socket = new SockJS(GEOF_CONFIG.CHAT_BASE + "/" + (parsed.public_key || 'geoffrey') + "/" + parsed.session + "/"),
-        me = this;
-
-    socket.onopen = function(e){
-      socket.send(JSON.stringify({'command': 'ping'}));
-    };
-
-    socket.onmessage = function(e) {
-      console.log(e);
-      var messages = me.state.messages || [];
-      messages.push(e);
-      me.setState({'messages': messages});
-    };
-
-    this.socket = socket;
+var ChatToggle = React.createClass({
+  render: function(){
+    return (<i onClick={this.toggle} className="fa fa-comments-o"></i>)
   },
-
-  getInitialState: function(){
-    return {'loading': true, "messages": []};
-  },
-
-  submitForm: function(){
-    var msg = this.refs['msg'].getValue();
-    this.socket.send(JSON.stringify({'type': 'chat', 'to': 'ben', 'message': msg}));
-    // this.refs['msg'].setValue('');
+  toggle: function(evt){
+    this.props.toggle();
     return false;
   },
+});
 
-  render: function() {
-    return (
-        <div>
-          <div className='container'>
-            {this.state.messages}
-          </div>
-          <div className="container">
-            <form onSubmit={this.submitForm}>
-              <Input type="text" ref='msg' />
-              <Button type='submit'>send</Button>
-            </form>
-          </div>
-        </div>
-    );
+var Conversation = React.createClass({
+  getInitialState: function(){
+    return {msg: ''};
+  },
+  componentDidMount: function(){
+    this.props.conversation.on("all", function() {
+      this.setState({});
+    }.bind(this));
+  },
+  render: function(){
+    var conversation = this.props.conversation,
+        messages = conversation.getMessages().map(function(msg){
+          var user = msg.attributes.from,
+              text = msg.attributes.text,
+              style = msg.isMine() ? {"text-align": "right"} : {};
+
+          return (<p style={style}>{text}</p>)
+        }.bind(this));
+
+    return (<div className="conversation">
+              <div className="messagesWrap">
+                <div className="messages">
+                  {messages}
+                </div>
+              </div>
+            </div>);
   }
 });
 
-React.render(<ChatApp />, document.getElementById('content')); // jshint ignore:line
-module.exports = ChatApp;
+var ConversationTitle = React.createClass({
+  render: function() {
+    var name = this.props.conversation.id[0];
+    return (<span>{name}</span>);
+  }
+});
+
+var SendMessage = React.createClass({
+
+  render: function(){
+    var disabled = this.props.conversationId == null;
+    return (<div className="sendmsg">
+              <form onSubmit={this.sendMessage}>
+                <Input
+                    disabled={disabled}
+                    placeholder="message"
+                    type="text"
+                    ref="message"
+                    buttonAfter={<Button type="submit"><Glyphicon glyph="send" /></Button>} />
+              </form>
+            </div>);
+  },
+
+  sendMessage: function(evt){
+    evt.preventDefault();
+    console.log(this);
+    var msg = this.refs.message.getValue().trim();
+    if (msg){
+      actions.sendMessage({"to": this.props.conversationId,
+                         "text": msg});
+    }
+  }
+
+});
+
+var NewConv = React.createClass({
+
+  getInitialState: function(){
+    return {jid: ''};
+  },
+
+  render: function(){
+    return (<div><form onSubmit={this.startConversation}>
+              <Input
+                  placeholder="username"
+                  type="text"
+                  ref="jid"
+                  buttonAfter={<Button type="submit"><Glyphicon glyph="plus" /></Button>} />
+            </form></div>)
+  },
+
+  startConversation: function(evt){
+    evt.preventDefault();
+    actions.startConversation(this.refs.jid.getValue());
+    this.setState({jid: ''});
+  }
+
+});
+
+
+var ChatApp = React.createClass({
+
+  componentWillMount: function() {
+    dispatcher.register(function(evt){
+      if (evt.actionType == 'connected'){
+        this.setState({loading: false, jid: evt.payload.jid})
+      }
+    }.bind(this));
+
+    // injecting in ember, oh, we are snarky!
+    $(".d-header ul[role='navigation']").prepend($('<li id="gfr-chat-toggle"></li>'));
+    React.render(<ChatToggle toggle={this._toggleWindow} />,
+        document.getElementById('gfr-chat-toggle'));
+
+
+    if (this.props.user){
+      var username = this.props.user.username.toLowerCase();
+      $.getJSON("/geoffrey/session.json").then(function(res){
+        initConnection(null, null, username, res.id);
+      })
+    } else {
+      initConnection();
+    }
+  },
+
+  getInitialState: function(){
+    return {'loading': true, "jid": false,
+             open: true, selectedConv: null};
+  },
+
+  componentDidMount: function(){
+    conversationStore.on("all", function(){
+      this.forceUpdate();
+    }.bind(this))
+  },
+
+  _toggleWindow: function(){
+    this.setState({open: !this.state.open});
+  },
+
+  render: function() {
+    var content = (<p>loading chat</p>),
+        convTabs = null;
+        clsname = "chat " + (this.state.open ? "open" : "");
+    if (!this.state.loading){
+      if (conversationStore.length === 0 ){
+       content = (<p> Please start a conversation </p>);
+      } else {
+
+        var tabs = _.map(conversationStore.models, function(conv, idx){
+                        return (<TabPane tab={<ConversationTitle conversation={conv} />}
+                                    key={conv.id} eventKey={conv.id}>
+                                </TabPane>);
+                      }),
+        selectedConv = conversationStore.get(this.state.selectedConv),
+        content = selectedConv ? (<Conversation
+                                    conversation={selectedConv} />) : (<p>please select a conversation</p>);
+        convTabs = (<TabbedArea activeKey={this.state.selectedConv}
+                                onSelect={this.handleSelectConv}>
+                    {tabs}
+                  </TabbedArea>);
+        console.log(selectedConv, this.state.selectedConv);
+      }
+    }
+
+    return (<div className={clsname}>
+              <div className="chat-window">
+                <NewConv />
+                {convTabs}
+                <div className="chatBox">
+                  {content}
+                </div>
+                <SendMessage conversationId={this.state.selectedConv} />
+              </div>
+            </div>);
+  },
+
+  handleSelectConv: function(selectedKey){
+    this.setState({selectedConv: selectedKey});
+  }
+  //<button onClick={this._toggleWindow} className='btn btn-primary'>close window</button>
+});
+
+module.exports = {
+  shouldBeLoaded: function(){
+    console.log(this);
+    return true;
+  },
+  component: ChatApp
+}

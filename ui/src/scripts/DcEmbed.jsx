@@ -4,6 +4,28 @@
 
 'use strict';
 
+var React = require('react/addons'),
+    _ = require("underscore"),
+    Chat = require('./ChatApp');
+
+var apps = [Chat];
+
+var EmbedApp = React.createClass({
+    render: function(){
+        var me = this,
+            components = _.filter(apps, function(x){
+                    return x.shouldBeLoaded.apply(me);
+                }).map(function(x){
+                    var component = x.component;
+                    return (<component user={me.props.user}
+                                       settings={me.props.settings}
+                                       config={me.props.config} />)
+                });
+        console.log(components);
+        return <div>{components}</div>;
+    }
+});
+
 (function() {
     var Discourse = window.Discourse;
     if (!Discourse || !Discourse.SiteSettings) throw "This does not appear to be a Discourse Instance. Exiting.";
@@ -17,6 +39,19 @@
     }
 
     function __startGeoffrey(config){
+        var baseDiv = document.createElement("div"),
+            user = Discourse.User.current(),
+            settings = Discourse.SiteSettings;
+
+        // setup and add to DOM
+        baseDiv.className = "geoffrey gfr gfr-dc";
+        baseDiv.id = "geoffrey-base-div";
+        document.getElementsByTagName("body")[0].appendChild(baseDiv);
+
+        // Let's go!
+        React.render(<EmbedApp user={user} config={config} settings={settings} />,
+                      document.getElementById('geoffrey-base-div')); // jshint ignore:line
+
         if (console && console.log){
             console.log(config, Discourse.SiteSettings, Discourse.User.current());
             console.log("Geoffrey embedded successfully.");

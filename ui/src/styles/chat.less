@@ -1,0 +1,107 @@
+
+body > .gfr {
+
+  @import  "~bootstrap/less/variables.less";
+
+  @text-color:            white;
+  @border-radius-base:        0px;
+  @border-radius-large:       0px;
+  @border-radius-small:       0px;
+
+
+  @icon-font-path: "~bootstrap/fonts/";
+  @import "~bootstrap/less/mixins.less";
+
+  @import "~bootstrap/less/normalize.less";
+  @import "~bootstrap/less/print.less";
+
+  @import "~bootstrap/less/scaffolding.less";
+  @import "~bootstrap/less/type.less";
+  @import "~bootstrap/less/code.less";
+  @import "~bootstrap/less/grid.less";
+  @import "~bootstrap/less/tables.less";
+  @import "~bootstrap/less/forms.less";
+  @import "~bootstrap/less/buttons.less";
+
+  @import "~bootstrap/less/component-animations.less";
+  @import "~bootstrap/less/glyphicons.less";
+  @import "~bootstrap/less/dropdowns.less";
+  @import "~bootstrap/less/button-groups.less";
+  @import "~bootstrap/less/input-groups.less";
+  @import "~bootstrap/less/navs.less";
+
+  .chat {
+    .nav {
+      .clearfix();
+      margin-left: 2px;
+    }
+
+    .chat-window {
+      form, .form-group {
+        margin-bottom: 0;
+      }
+      .input-group {
+        width: 100%;
+      }
+      > div {
+        display: table-row;
+      }
+      .chatBox {
+        width: 100%;
+        height: 100%;
+        .conversation {
+          display: table-cell;
+          .messagesWrap {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            .messages {
+              display: block;
+              position: absolute;
+              bottom: 0;
+              right: 0;
+              left: 0;
+            }
+          }
+        }
+      }
+      .sendmsg {
+        display: block;
+      }
+    }
+  }
+}
+
+
+//// CHAT FEATURE FROM THE RIGHT
+.gfr .chat {
+    overflow-x: hidden;
+
+    .chat-window {
+        position: fixed;
+        z-index: 2002;
+        background-color: rgba(40.4%, 71%, 82%, 0.99);
+        overflow: hidden;
+        -webkit-transition: all 0.3s;
+        -moz-transition: all 0.3s;
+        -ms-transition: all 0.3s;
+        -o-transition: all 0.3s;
+        transition: all 0.3s;
+        top: 0;
+        width: 300px;
+        height: 100%;
+        right: -300px;
+        display: table;
+    }
+    &.open .chat-window {
+        right: 0
+    }
+}
+
+@media all and (max-width: 330px) {
+    .chat-window{
+        top: 0;
+        width: 100%;
+        right: -100%;
+    }
+}
