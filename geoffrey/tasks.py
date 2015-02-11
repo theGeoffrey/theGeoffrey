@@ -100,10 +100,6 @@ def get_twitter_mentions(app_config, payload=None):
     return dfr
 
 
-
-def 
-
-
 mailchimp_subscribe.reacts_on_api_calls = ["user_new"]
 mailchimp_batch_subscribe.reacts_on_api_calls = ["add_batch"]
 post_form.reacts_on_api_calls = ["form_new"]
