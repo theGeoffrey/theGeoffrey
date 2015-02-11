@@ -15,7 +15,10 @@ _.each([
 
     // connectivity
     "connecting", "authenticating", "authFailed", "connFailed",
-    "attached", "disconnecting", "disconnected", "connected"
+    "attached", "disconnecting", "disconnected", "connected",
+
+    // rooms
+    "createRoom", "failureToCreateRoom", "roomCreated", "deleteRoom"
     ],
     function(name){
     actions[name] = function(payload){
