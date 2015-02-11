@@ -6,6 +6,7 @@ var index = {
     mailchimp: require('./Mailchimp'),
     forms: require('./Forms'),
     twitter: require('./Twitter'),
+    chat: require('./Chat')
 }
 
 
