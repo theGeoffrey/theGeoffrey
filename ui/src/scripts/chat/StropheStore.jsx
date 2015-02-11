@@ -115,6 +115,10 @@ function whoami(){
     return Strophe.getBareJidFromJid(connection.jid);
 }
 
+function getConnection(){
+  return connection;
+}
+
 dispatcher.register(function(evt) {
     switch(evt.actionType){
         case 'connected':
@@ -134,4 +138,4 @@ dispatcher.register(function(evt) {
     }
 });
 
-module.exports = {init: init, whoami: whoami};
+module.exports = {init: init, whoami: whoami, getConnection: getConnection};
