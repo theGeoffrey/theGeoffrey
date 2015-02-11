@@ -38,6 +38,9 @@ module.exports = {
     hasDB: function(){
         return currentDB != null;
     },
+    getDB: function(){
+        return currentDB;
+    },
     setDB: function(access_key) {
         var server;
         try {server = _get_endpoint(access_key);}catch(e){}

@@ -31,8 +31,8 @@ module.exports = React.createClass({
          <PanelGroup activeKey={panel_key} onClick={this.changePanelState} accordion>
             <Panel header={hdr} eventKey='1'>
                 <form className='form-horizontal'>
-                    <Input type="text" label="APP Key:" value={this.state.api_key} labelClassName="col-xs-2" wrapperClassName="col-xs-10" />
-                    <Input type="text" label="Public Key:" value={this.state.public_key} labelClassName="col-xs-2" wrapperClassName="col-xs-10" />
+                    <Input type="text" disabled label="APP Key:" value={this.props.api_key} labelClassName="col-xs-2" wrapperClassName="col-xs-10" />
+                    <Input type="text" disabled label="Public Key:" value={this.props.public_key} labelClassName="col-xs-2" wrapperClassName="col-xs-10" />
                     <Input type="text" label="Discourse URL:" defaultValue={this.state.dc_url} placeholder="enter your discourse url" labelClassName="col-xs-2" wrapperClassName="col-xs-10" />
                     <Input type="text" label="Discourse Username:" defaultValue={this.state.dc_username} placeholder="enter your discourse username" labelClassName="col-xs-2" wrapperClassName="col-xs-10" />
                     <Input type="text" label="Discourse Api Key:" defaultValue={this.state.dc_api_key} placeholder="enter your discourse api key" labelClassName="col-xs-2" wrapperClassName="col-xs-10" />

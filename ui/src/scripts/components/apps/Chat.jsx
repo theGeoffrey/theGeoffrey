@@ -74,7 +74,7 @@ connectToChatServer: function (e) {
 module.exports = {
         name: 'Chat',
         letter: 'C',
-        fa: 'chat',
+        fa: 'comments-o',
         bg_color: BG_COLOR,
         color: COLOR,
         show_on_overview: keyChecker('chat'),
