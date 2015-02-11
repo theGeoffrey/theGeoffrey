@@ -7,6 +7,7 @@
 var React = require('react/addons'),
     Label = require("react-bootstrap").Label,
     Button = require("react-bootstrap").Button,
+    ProgressBar = require("react-bootstrap").ProgressBar,
     dispatcher = require("../chat/dispatcher");
 
 function defaultChatState(){
@@ -85,8 +86,24 @@ var IconStateButton = React.createClass({
 var ConnectionProgress = React.createClass({
     mixins: [ConnectionStateMixin],
     getInitialState: defaultChatState,
+    getPercent: function(){
+        return ({"connected" : 100,
+                "connecting": 30,
+                "authenticating": 50,
+                "authFailed": 100,
+                "connFailed": 100,
+                "disconnecting": 90,
+                "disconnected": 100}[this.state.chatState] || 10);
+    },
     render: function(){
+        var percent = this.getPercent(),
+            bsStyle = this.getChatBsStyle(),
+            title = this.state.chatError || this.state.chatState;
 
+        if (percent <= 70)
+            return (<ProgressBar bsStyle={bsStyle} active  now={percent} label={title} />)
+        else
+            return (<ProgressBar bsStyle={bsStyle} now={percent} label={title} />)
     }
 });
 

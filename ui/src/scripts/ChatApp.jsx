@@ -11,7 +11,9 @@ var React = require('react/addons'),
     messageStore = require('./chat/MessageStore'),
     conversationStore = require('./chat/ConversationStore'),
     dispatcher = require('./chat/dispatcher'),
-    IconStateButton = require('./components/ChatConnectionState').IconStateButton,
+    chatStates = require('./components/ChatConnectionState'),
+    IconStateButton = chatStates.IconStateButton,
+    ConnectionProgress = chatStates.ConnectionProgress,
     queryString = require('query-string'),
     rtbs = require('react-bootstrap'),
     actions = require('./chat/actions'),
@@ -171,7 +173,7 @@ var ChatApp = React.createClass({
   },
 
   render: function() {
-    var content = (<p>loading chat</p>),
+    var content = (<ConnectionProgress />),
         convTabs = null,
         clsname = "chat " + (this.state.open ? "open" : "");
     if (!this.state.loading){
