@@ -4,7 +4,7 @@ var strph = require("strophe"), // becomes "window.Strophe"
     mam = require("strophe-plugins/mam"), // Message Archive Management Protocol
     roster = require("strophe-plugins/roster"), // Roster Management
     actions = require("./actions"),
-    dispatcher = require("./dispatcher"),
+    simple_register = require("./_helpers").simple_register,
     BOSH_SERVICE = 'ws://chat.thegeoffrey.co/ws-xmpp/',
     connection = null,
     // wrapping strophe ....
@@ -118,23 +118,20 @@ function getConnection(){
   return connection;
 }
 
-dispatcher.register(function(evt) {
-    switch(evt.actionType){
-        case 'connected':
-            connection.addHandler(onMessage, null, 'message', null, null,  null);
-            // set presence to there
-            connection.send($pres().tree());
-            // query the roster, will query the archive
-            query_roster(connection);
 
-        break;
-        case 'sendMessage':
-            var payload = evt.payload,
-                reply = $msg({to: payload.to.trim(), type: 'chat'})
-                            .cnode(Strophe.xmlElement('body', evt.payload.text.trim()));
-            connection.send(reply.tree());
-        break;
-    }
+simple_register({
+  "connected": function(evt){
+    connection.addHandler(onMessage, null, "message", null, null,  null);
+    // set presence to there
+    connection.send($pres().tree());
+    // query the roster, will query the archive
+    query_roster(connection);
+  },
+  "sendMessage": function(payload){
+    var reply = $msg({to: payload.to.trim(), type: "chat"})
+                    .cnode(Strophe.xmlElement('body', payload.text.trim()));
+    connection.send(reply.tree());
+  }
 });
 
 module.exports = {init: init, whoami: whoami, getConnection: getConnection};
