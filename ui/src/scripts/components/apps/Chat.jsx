@@ -21,7 +21,9 @@ var React = require('react/addons'),
     mucStore = require('../../chat/MucStore'),
     ListGroup = rtbs.ListGroup,
     ListGroupItem = rtbs.ListGroupItem,
+    Well = rtbs.Well,
     rooms = mucStore.rooms,
+    Button = rtbs.Button,
     fakerooms = ['oneRoom', 'twoRoom', 'threeRoom'],
     OAuth = window.OAuth;
 
@@ -34,13 +36,24 @@ var RoomsList = React.createClass({
   render: function(){
     return(
       <div>
-      <ListGroup>
+      <Well bsSize="large">
+      <form onSubmit={this.createRoom} className='form-horizontal'>
+      <h4>Add a new room:</h4>
+      <Input type='text' label="Room Name" labelClassName="col-xs-2" 
+                      wrapperClassName="col-xs-10" value=""  
+                      placeholder="Name" ref="name" /> 
+        <Button bsStyle="success" className="btn btn-primary" type="submit">Add Room</Button>
+      </form>
+      <br />
       {_.map(fakerooms, function(name){
               return(
-                 <ListGroupItem>{name}<button className="btn btn-primary">delete room</button></ListGroupItem>
+                <Well>
+                <Button bsStyle="danger" bsSize="xsmall" className="btn btn-secondary chat-room">delete {name}</Button>
+                <br />
+                </Well>
+              
             )})}
-      </ListGroup>
-      <button className="btn btn-primary" onClick={this.createRoom}>Add Room</button>
+      </Well>
       </div>
       );
   }
@@ -50,7 +63,7 @@ var Chat = React.createClass({
   _color: COLOR,
   _bg_color: BG_COLOR,
   _key: 'chat',
-  _sync_keys: ['groups'],
+  _sync_keys: ['rooms'],
   _services: ['chat_main', 'chat_shoutbox'],
   _name: "Chat",
   mixins: [SimpleAppMixin],
@@ -76,13 +89,14 @@ connectToChatServer: function (e) {
   
   _render: function(){
     var server_mess = this.state.loading ? 'loading' : this.state.jid;
-    var message = <h4>Connect to views romms </h4>;
+    var message = <h5><br /><strong>Connect to the server to view rooms</strong></h5>;
     var show_rooms = this.state.loading ? message : <RoomsList />;
+  
   
     return(
       <div>
         <form onSubmit={this._defaultFormSubmit} className='form-horizontal'>
-          <h4>Activate Chat</h4>
+          <h3>Activate Chat</h3>
           <Input type="checkbox"
                    defaultChecked={this.state.chat_main}
                    ref="chat_main" 
@@ -98,7 +112,8 @@ connectToChatServer: function (e) {
                       placeholder="Groups" readOnly ref="groups" /> 
           <button className="btn btn-primary btn-form" type="submit">Save</button>
         </form>
-
+        <br />
+         <h3>Manage Rooms</h3>
          {show_rooms}
         <button className="btn btn-primary btn-form" onClick={this.connectToChatServer}>Connect</button>
       </div>
