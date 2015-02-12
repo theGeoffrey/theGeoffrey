@@ -34,15 +34,15 @@ var RoomsList = React.createClass({
     var name = this.refs['name'].getValue().trim();
     actions.createRoom(name)
   },
-  
+
   render: function(){
     return(
       <div>
-      <Well bsSize="large">
+      <Well bsSize="large" bsStyle="success">
       <form onSubmit={this.createRoom} className='form-horizontal'>
       <h4>Add a new room:</h4>
       <Input type='text' label="Room Name" labelClassName="col-xs-2" 
-                      wrapperClassName="col-xs-10" value=""  
+                      wrapperClassName="col-xs-10" value={this.props.name}  
                       placeholder="Name" ref="name" /> 
         <Button bsStyle="success" className="btn btn-primary" type="submit">Add Room</Button>
       </form>
