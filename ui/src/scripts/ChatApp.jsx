@@ -146,11 +146,12 @@ var ChatApp = React.createClass({
     React.render(<ChatToggle toggle={this._toggleWindow} />,
         document.getElementById('gfr-chat-toggle'));
 
-    var chat_domain = this.props.config.chat_domain;
+    var chat_domain = this.props.config.chat_domain,
+        public_key = this.props.settings.geoffrey_public_key;
     if (this.props.user){
       var username = this.props.user.username.toLowerCase();
       $.getJSON("/geoffrey/session.json").then(function(res){
-        initConnection(null, chat_domain, username, res.id);
+        initConnection(null, chat_domain, username, res.id + "@" + public_key);
       })
     // } else {
     //   initConnection(null, chat_domain);
