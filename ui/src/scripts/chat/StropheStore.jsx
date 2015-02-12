@@ -1,7 +1,7 @@
 'use strict';
 
 var strph = require("strophe"), // becomes "window.Strophe"
-    mam = require("strophe-plugins/mam"), // Message Archive Management Protocol
+    // mam = require("strophe-plugins/mam"), // Message Archive Management Protocol
     roster = require("strophe-plugins/roster"), // Roster Management
     actions = require("./actions"),
     simple_register = require("./_helpers").simple_register,
