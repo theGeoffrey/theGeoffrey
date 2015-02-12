@@ -123,7 +123,9 @@ class GeoffreyApi(Klein):
             self._api_trigger_wrapper("{}_schedule".format(item)))
 
     def get_server_settings(self, request):
-        domain = urlparse(request.config['dc_url']).hostname
+        domain = ""
+        if hasattr(request, "config"):
+            domain = urlparse(request.config['dc_url']).hostname
 
         settings = {"capabilities": {},
                     "chat_domain": domain,
@@ -204,15 +206,14 @@ def add_form(request):
     return SUCCESS
 
 
-@app.route("/embed_config.json")
+@app.route("/start_embed.js")
 @app.public
 def embed_config(request):
     json_p = request.args.get('json_p', [None])[0] or "__startGeoffrey"
     # FIXME: ask the apps what to send...
     settings = app.get_server_settings(request)
-    return "{}({});".format(json_p,
-                            json.dumps({'settings': settings,
-                                        'config': request.config}))
+    return "{}({});".format(json_p, json.dumps(settings))
+
 
 @app.route('/ping')
 @app.secure

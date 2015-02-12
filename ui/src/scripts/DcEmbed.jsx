@@ -62,6 +62,6 @@ var EmbedApp = React.createClass({
 
     // embed at the
     var gfr = document.createElement('script'); gfr.type = 'text/javascript'; gfr.async = true;
-    gfr.src = endpoint + 'api/embed_config.json?jsonp=__startGeoffrey&public_key=' + public_key;
+    gfr.src = endpoint + 'api/start_embed.js?jsonp=__startGeoffrey&public_key=' + public_key;
     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gfr, s);
 })();
