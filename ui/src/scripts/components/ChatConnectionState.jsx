@@ -8,19 +8,19 @@ var React = require('react/addons'),
     Label = require("react-bootstrap").Label,
     Button = require("react-bootstrap").Button,
     ProgressBar = require("react-bootstrap").ProgressBar,
+    getConnection = require("../chat/StropheStore").getConnection,
     dispatcher = require("../chat/dispatcher");
 
 function defaultChatState(){
-    return {chatError: false, chatState: false};
+    return {chatError: false, chatState: getConnection().connected ? "connected": false};
 }
-
 
 var ConnectionStateMixin = {
     componentWillMount: function(){
-        dispatcher.register(this._dispatched);
+        this._dispatch_token = dispatcher.register(this._dispatched);
     },
     componentWillUnmount: function () {
-        dispatcher.unregister(this._dispatched);
+        this._dispatch_token && dispatcher.unregister(this._dispatch_token);
     },
     getChatBsStyle: function(){
         return ({"connected" : "success",
@@ -44,10 +44,9 @@ var ConnectionStateMixin = {
     _dispatched: function (evt) {
         if (evt.actionType === "connected" || evt.actionType === "attached"){
             this.setState({chatConnected: true, chatError: false, chatState: "connected"});
-        } else if ([0,
-                "connecting", "authenticating",
-                "authFailed", "connFailed", "attached",
-                "disconnecting", "disconnected"].indexOf(evt.actionType))
+        } else if (["connecting", "authenticating",
+                    "authFailed", "connFailed", "attached",
+                    "disconnecting", "disconnected"].indexOf(evt.actionType) >= 0)
         {
             var new_state = {chatConnected: evt.actionType == "disconnecting", chatState: evt.actionType};
             if (evt.actionType === "authFailed" || evt.actionType === "conFailed"){
@@ -88,12 +87,12 @@ var ConnectionProgress = React.createClass({
     getInitialState: defaultChatState,
     getPercent: function(){
         return ({"connected" : 100,
-                "connecting": 30,
-                "authenticating": 50,
-                "authFailed": 100,
-                "connFailed": 100,
-                "disconnecting": 90,
-                "disconnected": 100}[this.state.chatState] || 10);
+                 "connecting": 30,
+                 "authenticating": 50,
+                 "authFailed": 100,
+                 "connFailed": 100,
+                 "disconnecting": 90,
+                 "disconnected": 100}[this.state.chatState] || 10);
     },
     render: function(){
         var percent = this.getPercent(),
