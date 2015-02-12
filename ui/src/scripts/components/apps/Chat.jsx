@@ -109,9 +109,6 @@ connectToChatServer: function (e) {
                    ref="chat_shoutbox" 
                    wrapperClassName="col-xs-offset-1 col-xs-10"
                    label="Activate shoutbox"/> 
-          <Input type='textarea' label="Server output:" labelClassName="col-xs-2" 
-                      wrapperClassName="col-xs-10" value={server_mess}  
-                      placeholder="Groups" readOnly ref="groups" /> 
           <button className="btn btn-primary btn-form" type="submit">Save</button>
         </form>
         <br />
