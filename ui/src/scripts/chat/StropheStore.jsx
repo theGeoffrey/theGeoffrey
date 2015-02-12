@@ -3,7 +3,6 @@
 var strph = require("strophe"), // becomes "window.Strophe"
     mam = require("strophe-plugins/mam"), // Message Archive Management Protocol
     roster = require("strophe-plugins/roster"), // Roster Management
-    muc = require("strophe-plugins/muc"), // Multi User Chat
     actions = require("./actions"),
     dispatcher = require("./dispatcher"),
     BOSH_SERVICE = 'ws://chat.thegeoffrey.co/ws-xmpp/',

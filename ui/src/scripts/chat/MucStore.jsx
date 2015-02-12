@@ -3,6 +3,7 @@
 var strph = require("strophe"),
     dispatcher = require("./dispatcher"),
     Strophe = window.Strophe,
+    muc = require("strophe-plugins/muc"), // Multi User Chat
     stropheStore = require('./StropheStore'),
     getConnection = stropheStore.getConnection,
     actions = require("./actions"),
@@ -16,8 +17,8 @@ var RoomCollection = Backbone.Collection.extend({
 var rooms = new RoomCollection();
 
 function parseRooms(rooms){
-    console.log("INCOMING ROOMS:",rooms);
-} 
+    console.log("INCOMING ROOMS:", rooms);
+}
 
 function createdRoom(success){
     console.log('successfully created room', success);
