@@ -12,7 +12,7 @@ var React = require('react/addons'),
     dispatcher = require("../chat/dispatcher");
 
 function defaultChatState(){
-    return {chatError: false, chatState: getConnection().connected ? "connected": false};
+    return {chatError: false, chatState: (getConnection() || "").connected ? "connected": false};
 }
 
 var ConnectionStateMixin = {
