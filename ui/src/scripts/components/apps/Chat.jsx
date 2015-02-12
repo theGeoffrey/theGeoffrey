@@ -29,8 +29,10 @@ var React = require('react/addons'),
 
 var RoomsList = React.createClass({
 
-  createRoom: function (){
-  actions.createRoom()
+  createRoom: function (evt){
+    evt.preventDefault();
+    var name = this.refs['name'].getValue().trim();
+    actions.createRoom(name)
   },
   
   render: function(){
