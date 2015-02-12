@@ -39,11 +39,10 @@ dispatcher.register(function(evt) {
     switch(evt.actionType){
         case "connected":
         getConnection().muc.listRooms('chat.thegeoffrey.co', parseRooms, failureToGetRooms);
-        getConnection().muc.createInstantRoom('newRoom', createdRoom, failureToCreateRoom);
         break
 
         case "createRoom":
-        getConnection().muc.createConfiguredRoom('newRoom', {"muc#roomconfig_publicroom": "1", "muc#roomconfig_persistentroom": "1"}, createdRoom, failureToCreateRoom);
+        getConnection().muc.createConfiguredRoom(evt.payload, {"muc#roomconfig_publicroom": "1", "muc#roomconfig_persistentroom": "1"}, createdRoom, failureToCreateRoom);
         break
 
         case "deleteRoom":
