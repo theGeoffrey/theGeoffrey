@@ -188,8 +188,10 @@ def create_session(request):
 @app.public
 @app.with_session
 def confirm_session_pair(request, **kwargs):
+    server_config = app.get_server_settings(request)
     for key, value in request.args.iteritems():
-        if request.session.get(key, None) != value:
+        if request.session.get(key, None) != value and \
+                server_config.get(key, None) != value:
             break
     else:
         # none broke, we are good to return true
