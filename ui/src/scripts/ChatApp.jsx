@@ -152,8 +152,8 @@ var ChatApp = React.createClass({
       $.getJSON("/geoffrey/session.json").then(function(res){
         initConnection(null, chat_domain, username, res.id);
       })
-    } else {
-      initConnection(null, chat_domain);
+    // } else {
+    //   initConnection(null, chat_domain);
     }
   },
 
