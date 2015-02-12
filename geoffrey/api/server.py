@@ -14,6 +14,7 @@ from geoffrey.helpers import get_database_connection, get_request_param
 from geoffrey.utils import (get_active_services_for_api, db_now,
                             db_date_format, db_date_parse)
 from geoffrey import tasks
+from urlparse import urlparse
 
 import json
 
@@ -121,8 +122,11 @@ class GeoffreyApi(Klein):
         self.route('/trigger/{}/schedule'.format(item), methods=["GET"])(
             self._api_trigger_wrapper("{}_schedule".format(item)))
 
-    def get_server_settings(self):
+    def get_server_settings(self, request):
+        domain = urlparse(request.config['dc_url']).hostname
+
         settings = {"capabilities": {},
+                    "chat_domain": domain,
                     "COUCH": {
                         "DOMAIN": CONFIG.COUCHDB_DOMAIN,
                         "PROTO": CONFIG.get('COUCH_PROTO') or 'http'},
@@ -205,7 +209,7 @@ def add_form(request):
 def embed_config(request):
     json_p = request.args.get('json_p', [None])[0] or "__startGeoffrey"
     # FIXME: ask the apps what to send...
-    settings = app.get_server_settings()
+    settings = app.get_server_settings(request)
     return "{}({});".format(json_p,
                             json.dumps({'settings': settings,
                                         'config': request.config}))

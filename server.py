@@ -16,7 +16,7 @@ def api(request):
 @app.route("/server_config.js")
 def config(request):
     return "window.GEOF_CONFIG = {}".format(
-           json.dumps(app.get_server_settings()))
+           json.dumps(app.get_server_settings(request)))
 
 
 
