@@ -6,8 +6,8 @@ var Backbone = require('backbone'),
 
 
 function _get_endpoint(inp){
-    var BASE = window.GEOF_CONFIG.COUCH_SERVER || "localhost:5984",
-        protocol = window.GEOF_CONFIG.COUCH_PROTO || "http://";
+    var BASE = window.GEOF_CONFIG.COUCH.DOMAIN,
+        protocol = (window.GEOF_CONFIG.COUCH.PROTO || "http") + "://";
 
     if (inp === "geoffrey"){
         return protocol + BASE + "/geoffrey"
