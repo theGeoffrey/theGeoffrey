@@ -93,6 +93,7 @@ connectToChatServer: function (e) {
     var server_mess = this.state.loading ? 'loading' : this.state.jid;
     var message = <h5><br /><strong>Connect to the server to view rooms</strong></h5>;
     var show_rooms = this.state.loading ? message : <RoomsList />;
+    var buttonTitle = this.state.loading ? 'Connect' : 'Refresh';
   
   
     return(
@@ -114,7 +115,7 @@ connectToChatServer: function (e) {
         <br />
          <h3>Manage Rooms</h3>
          {show_rooms}
-        <button className="btn btn-primary btn-form" onClick={this.connectToChatServer}>Connect</button>
+        <button className="btn btn-primary btn-form" onClick={this.connectToChatServer}>{buttonTitle}</button>
       </div>
     );
   }
