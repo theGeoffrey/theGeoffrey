@@ -190,6 +190,7 @@ def create_session(request):
 def confirm_session_pair(request, **kwargs):
     server_config = app.get_server_settings(request)
     for key, value in request.args.iteritems():
+        value = value[0]
         if request.session.get(key, None) != value and \
                 server_config.get(key, None) != value:
             break
