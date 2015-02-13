@@ -56,9 +56,10 @@ var Conversation = React.createClass({
         messages = conversation.getMessages().map(function(msg){
           var user = msg.attributes.from,
               text = msg.attributes.text,
-              style = msg.isMine() ? {"text-align": "right"} : {};
+              style = msg.isMine() ? {"text-align": "right"} : {},
+              cls = msg.isMine() ? "msgIn" : "msgOut";
 
-          return (<p style={style}>{text}</p>)
+          return (<p className={cls} style={style}>{text}</p>)
         }.bind(this));
 
     return (<div className="conversation">
