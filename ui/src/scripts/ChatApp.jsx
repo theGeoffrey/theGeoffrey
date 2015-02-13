@@ -56,9 +56,10 @@ var Conversation = React.createClass({
         messages = conversation.getMessages().map(function(msg){
           var user = msg.attributes.from,
               text = msg.attributes.text,
-              style = msg.isMine() ? {"text-align": "right"} : {};
+              style = msg.isMine() ? {"text-align": "right"} : {},
+              cls = msg.isMine() ? "msgIn" : "msgOut";
 
-          return (<p style={style}>{text}</p>)
+          return (<p className={cls} style={style}>{text}</p>)
         }.bind(this));
 
     return (<div className="conversation">
@@ -79,7 +80,9 @@ var ConversationTitle = React.createClass({
 });
 
 var SendMessage = React.createClass({
-
+getInitialState: function(){
+    return {text: ''};
+  },
   render: function(){
     var disabled = this.props.conversationId == null;
     return (<div className="sendmsg">
@@ -87,20 +90,32 @@ var SendMessage = React.createClass({
                 <Input
                     disabled={disabled}
                     placeholder="message"
+                    value={this.state.text}
+                    onChange={this.didType}
                     type="text"
                     ref="message"
                     buttonAfter={<Button type="submit"><Glyphicon glyph="send" /></Button>} />
               </form>
             </div>);
   },
+  didType: function(evt){
+    this.setState({
+      text: this.refs.message.getValue()
+    });
+  },
 
   sendMessage: function(evt){
     evt.preventDefault();
     console.log(this);
     var msg = this.refs.message.getValue().trim();
+    this.refs.message.value = ''
     if (msg){
       actions.sendMessage({"to": this.props.conversationId,
                          "text": msg});
+
+      this.setState({
+        text: ''
+    });
     }
   }
 
