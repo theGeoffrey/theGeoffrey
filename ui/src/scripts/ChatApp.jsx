@@ -42,6 +42,28 @@ var ChatToggle = React.createClass({
   },
 });
 
+var Message = React.createClass({
+  componentDidMount: function(){
+    this.props.model.on("change", function(){
+      console.log("UPDATE");
+      this.forceUpdate();
+    }.bind(this));
+  },
+  render: function(){
+    var model = this.props.model,
+        cooked = model.getCooked(),
+        id = model.id || model._cid,
+        style = model.isMine() ? {"text-align": "right"} : {},
+        cls = model.isMine() ? "msgIn" : "msgOut";
+
+    return (<div
+              key={id}
+              className={cls}
+              style={style}
+              dangerouslySetInnerHTML={{__html: cooked}}></div>)
+  }
+})
+
 var Conversation = React.createClass({
   getInitialState: function(){
     return {msg: ''};
@@ -54,12 +76,7 @@ var Conversation = React.createClass({
   render: function(){
     var conversation = this.props.conversation,
         messages = conversation.getMessages().map(function(msg){
-          var user = msg.attributes.from,
-              text = msg.attributes.text,
-              style = msg.isMine() ? {"text-align": "right"} : {},
-              cls = msg.isMine() ? "msgIn" : "msgOut";
-
-          return (<p className={cls} style={style}>{text}</p>)
+          return (<Message model={msg} />)
         }.bind(this));
 
     return (<div className="conversation">

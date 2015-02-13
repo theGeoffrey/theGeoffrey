@@ -15,9 +15,57 @@ var strph = require("strophe"),
 // We act with the ':tmp'-namespace, as implemented by mongooseim
 Strophe.addNamespace('MAM', 'urn:xmpp:mam:tmp');
 
+
+
+//
+// Unfortunately the Discourse.Onebox INSISTS on acting on live-elements
+// that is very incomptabile with what we are doing here, so ... 
+//
+// ONCE MORE: OUR OWN IMPLEMENTATION, YEAH
+__onebox_url_cache = {}
+
 var Message = Backbone.Model.extend({
     isMine: function(){
         return !this.get("from") || (this.get("from") === whoami());
+    },
+
+    _doOneBox: function(item){
+        console.log(this, item);
+        var url = item.href,
+            model = this,
+            cached = Discourse.Onebox.lookupCache(url);
+
+        if (cached) {
+            $(item).replaceWith(cached);
+            return
+        }
+
+        // we cache our requests to enabled easier refresh management
+        if (!__onebox_url_cache[url]){
+            __onebox_url_cache[url] = Discourse.ajax("/onebox", {
+              dataType: 'html',
+              data: { url: url, refresh: false }
+            });
+        }
+
+        var promise = __onebox_url_cache[url];
+
+        promise.then(function(html) {
+            Discourse.Onebox.cache(url, html);
+            model._cooked = null;
+            model.trigger("change");
+        });
+    },
+
+    getCooked: function(){
+        if (!this._cooked) {
+            var $cook = $(Discourse.Markdown.cook(this.get("text")));
+            $cook.find("a.onebox").each(function(idx, elem){
+                this._doOneBox(elem)}.bind(this));;
+
+            this._cooked = $cook.html();
+        }
+        return this._cooked;
     }
 });
 
