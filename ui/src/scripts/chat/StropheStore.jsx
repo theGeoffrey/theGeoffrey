@@ -4,6 +4,7 @@ var strph = require("strophe"), // becomes "window.Strophe"
     // mam = require("strophe-plugins/mam"), // Message Archive Management Protocol
     roster = require("strophe-plugins/roster"), // Roster Management
     actions = require("./actions"),
+    moment = require("moment"),
     simple_register = require("./_helpers").simple_register,
     BOSH_SERVICE = 'ws://chat.thegeoffrey.co/ws-xmpp/',
     connection = null,
@@ -18,19 +19,53 @@ function log(){
 
 function onMessage(msg) {
     log(msg);
-    var payload = {
+    var type = msg.getAttribute('type');
+
+    console.log(type);
+    if (type == null) {
+      // MAM: we are an archive
+      var result = msg.childNodes[0],
+          delay = result.getElementsByTagName("delay")[0],
+          timestamp = delay.getAttribute("stamp"),
+          from = delay.getAttribute("from"),
+          message = msg.getElementsByTagName("message"),
+          payload = {from: Strophe.getBareJidFromJid(from),
+                     id: result.id, // our archive ID
+                     timestamp: moment(timestamp)};
+
+      if (!message.length) return;
+
+      message = message[0];
+      payload["to"] = Strophe.getBareJidFromJid(message.getAttribute("to"));
+      payload["text"] = Strophe.getText(message.childNodes[0]);
+
+      actions.receiveMessage(payload);
+
+      console.log("archived message", payload);
+
+    } else if (type == "chat") {
+      var payload = {
             to: Strophe.getBareJidFromJid(msg.getAttribute('to')),
             from: Strophe.getBareJidFromJid(msg.getAttribute('from'))
-        },
-        type = msg.getAttribute('type'),
-        elems = msg.getElementsByTagName('body');
+          },
+          body = msg.getElementsByTagName('body'),
+          archive = msg.getElementsByTagName('archived');
 
-    if (type == "chat" && elems.length > 0) {
-        var body = elems[0];
-        payload['text'] = Strophe.getText(body);
+      if (!body.length) return;
+
+      payload['text'] = Strophe.getText(body[0]);
+      payload["timestamp"] = moment();
+
+      if (archive.length){
+        // MAM: archive ID is given for us for later lookup
+        payload['id'] = archive[0].id;
+      }
+
+      actions.receiveMessage(payload);
+
+    } else if (type == "groupchat"){
+      // FIXME: not yet support
     }
-
-    actions.receiveMessage(payload);
 
     // we must return true to keep the handler alive.
     // returning false would remove it after it finishes.
@@ -89,19 +124,6 @@ function init(service, server, username, session_id){
     });
 };
 
-function query_archive_for_user(connection, target){
-    connection.mam.query(connection.jid, {
-      "with": target,
-      onMessage: function(message) {
-        console.log(message);
-        actions.receiveMessage(message);
-        return true;
-      },
-      onComplete: function(response) {
-                console.log("Got all the messages with " + target);
-      }
-    });
-}
 
 function query_roster(connection){
     connection.roster.get(function(){
@@ -112,6 +134,10 @@ function query_roster(connection){
 
 function whoami(){
     return Strophe.getBareJidFromJid(connection.jid);
+}
+
+function isMe(compareJid){
+  return whoami() === Strophe.getBareJidFromJid(compareJid);
 }
 
 function getConnection(){
@@ -134,4 +160,7 @@ simple_register({
   }
 });
 
-module.exports = {init: init, whoami: whoami, getConnection: getConnection};
+module.exports = {init: init,
+                  isMe: isMe,
+                  whoami: whoami,
+                  getConnection: getConnection};

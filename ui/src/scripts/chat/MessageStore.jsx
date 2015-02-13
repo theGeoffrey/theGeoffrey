@@ -35,20 +35,23 @@ function query_message_archive(connection) {
         }, Strophe.NS.MAM, "message", null);
 
 
-    // query as mongooseIM asks us to do
-    // https://github.com/esl/MongooseIM/wiki/Recent-messages-in-MAM#get-last-50-messages
+    // query whatever the MAM server condisers a good fallback amount...
     // <iq type='get'>
     //   <query xmlns='urn:xmpp:mam:tmp'>
     //       <before/>
-    //       <max>100</max>
+    //       <simple />
     //   </query>
     // </iq>
+    //
+    // inspired by
+    // https://github.com/esl/MongooseIM/wiki/Recent-messages-in-MAM#get-last-50-messages
+    // but without "simple", mongoose tells us we violate the policy ...
+    // simple means, we don't want it to count the total – slow on PG anyways.
 
     var query = $iq({type: "get"}
                  ).c("query", {xmlns: Strophe.NS.MAM}
                     ).c('before').up(
-                    ).c('max'
-                        ).t(100);
+                    ).c('simple');
     console.log(query.tree());
     connection.sendIQ(query, function(){
         console.log("successfully send IQ", arguments);

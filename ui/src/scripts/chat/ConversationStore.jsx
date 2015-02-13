@@ -1,12 +1,12 @@
 
 var messages = require("./MessageStore"),
+    isMe = require("./StropheStore").isMe,
     _ = require("underscore"),
     dispatcher = require("./dispatcher")
     Backbone = require('backbone');
 
 var Conversation = Backbone.Model.extend({
     _filter: function(msg){
-        console.log(msg, this.id);
         return msg && (msg.attributes.to === this.id || msg.attributes.from === this.id);
     },
     initialize: function(){
@@ -41,7 +41,7 @@ dispatcher.register(function(evt) {
         convsersations.get_or_create(evt.payload.to);
         break;
         case 'receiveMessage':
-        convsersations.get_or_create(evt.payload.from);
+        convsersations.get_or_create(isMe(evt.payload.from) ? evt.payload.to : evt.payload.from);
         break;
     }
 });
