@@ -165,14 +165,16 @@ var NewConv = React.createClass({
 
 var ConvTab = React.createClass({
 
-render: function() {
-    var key = this.props.key;
+  onClick: function(evt){
+    this.props.onSelect(this.props.conversation.id);
+  },
+
+  render: function() {
     var conversation = this.props.conversation;
     var state = this.props.active ? "activeConv" : "inactiveConv";
     
     return (
-
-      <div className="convTab">
+      <div onClick={this.onClick} className="convTab">
         <ConversationTitle conversation={conversation} />
         <div className={state} />
       </div>
@@ -183,26 +185,18 @@ render: function() {
 
 var ConvTabs = React.createClass({
 
-
-  isActive: function(selectedConv, conv){
-    var active = '';
-
-    if (selectedConv.id === conv.id) {
-      active = 'active';
-    }
-
-    return active;
-  },
-
-
   render: function() {
     var conversations = this.props.conversations,
-      selectedConv = this.props.selectedConv;
+      selectedConv = this.props.selectedConv,
+      onSelect = this.props.onSelect;
+
+    console.log(conversations);
 
     var tabs = _.map(conversations, function(conv, idx){
-                        var active = isActive(selectedConv, conv)
-                        return (<ConvTab conversation={conv} active />);
-                      });
+                        var active = conv.id == selectedConv;
+                        return (<ConvTab conversation={conv} active={active} onSelect={onSelect} />);
+                      }.bind(this));
+    console.log(tabs);
     return (
       <div className="convTabs">
         {tabs}
@@ -255,7 +249,6 @@ var ChatApp = React.createClass({
   render: function() {
     var content = (<ConnectionProgress />),
         convs = conversationStore.models,
-        convTabs = null,
         clsname = "chat " + (this.state.open ? "open" : "");
     if (!this.state.loading){
       if (conversationStore.length === 0 ){
@@ -264,18 +257,10 @@ var ChatApp = React.createClass({
 
       else {
 
-        var tabs = _.map(conversationStore.models, function(conv, idx){
-                        return (<TabPane tab={<ConversationTitle conversation={conv} />}
-                                    key={conv.id} eventKey={conv.id}>
-                                </TabPane>);
-                      }),
-        selectedConv = conversationStore.get(this.state.selectedConv),
+        var selectedConv = conversationStore.get(this.state.selectedConv),
         content = selectedConv ? (<Conversation
                                     conversation={selectedConv} />) : (<p>please select a conversation</p>);
-        convTabs = (<TabbedArea activeKey={this.state.selectedConv}
-                                onSelect={this.handleSelectConv}>
-                    {tabs}
-                  </TabbedArea>);
+        
         console.log(selectedConv, this.state.selectedConv);
       }
     }
@@ -286,7 +271,7 @@ var ChatApp = React.createClass({
     return (<div className={clsname}>
               <div className="chat-window">
                 <div className="chatBox">
-                  <ConvTabs conversations={convs} selectedConv={selectedConv}/>
+                  <ConvTabs conversations={convs} selectedConv={selectedConv} onSelect={this.handleSelectConv}/>
                   <div className="convWrap">
                     <SendMessage conversationId={this.state.selectedConv} />
                     {content}
