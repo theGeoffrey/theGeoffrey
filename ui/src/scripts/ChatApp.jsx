@@ -163,6 +163,53 @@ var NewConv = React.createClass({
 
 });
 
+var ConvTab = React.createClass({
+
+render: function() {
+    var key = this.props.key;
+    var conversation = this.props.conversation;
+    var state = this.props.active ? "activeConv" : "inactiveConv";
+    
+    return (
+
+      <div className="convTab">
+        <ConversationTitle conversation={conversation} />
+        <div className={state} />
+      </div>
+
+      );
+  }
+});
+
+var ConvTabs = React.createClass({
+
+
+  isActive: function(selectedConv, conv){
+    var active = '';
+
+    if (selectedConv.id === conv.id) {
+      active = 'active';
+    }
+
+    return active;
+  },
+
+
+  render: function() {
+    var conversations = this.props.conversations,
+      selectedConv = this.props.selectedConv;
+
+    var tabs = _.map(conversations, function(conv, idx){
+                        var active = isActive(selectedConv, conv)
+                        return (<ConvTab conversation={conv} active />);
+                      });
+    return (
+      <div className="convTabs">
+        {tabs}
+      </div>      
+    );
+  }
+});
 
 var ChatApp = React.createClass({
 
@@ -207,12 +254,15 @@ var ChatApp = React.createClass({
 
   render: function() {
     var content = (<ConnectionProgress />),
+        convs = conversationStore.models,
         convTabs = null,
         clsname = "chat " + (this.state.open ? "open" : "");
     if (!this.state.loading){
       if (conversationStore.length === 0 ){
-       content = (<p> Please start a conversation </p>);
-      } else {
+       content = (<div className="conversation"><p> Please start a conversation </p></div>);
+      } 
+
+      else {
 
         var tabs = _.map(conversationStore.models, function(conv, idx){
                         return (<TabPane tab={<ConversationTitle conversation={conv} />}
@@ -230,14 +280,18 @@ var ChatApp = React.createClass({
       }
     }
 
+    // <NewConv />
+    // {convTabs}
+
     return (<div className={clsname}>
               <div className="chat-window">
-                <NewConv />
-                {convTabs}
                 <div className="chatBox">
-                  {content}
+                  <ConvTabs conversations={convs} selectedConv={selectedConv}/>
+                  <div className="convWrap">
+                    <SendMessage conversationId={this.state.selectedConv} />
+                    {content}
+                  </div>
                 </div>
-                <SendMessage conversationId={this.state.selectedConv} />
               </div>
             </div>);
   },

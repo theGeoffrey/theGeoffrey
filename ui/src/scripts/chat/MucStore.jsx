@@ -17,12 +17,18 @@ var RoomCollection = Backbone.Collection.extend({
 var rooms = new RoomCollection();
 
 function parseRooms(rooms){
-    console.log("INCOMING ROOMS:", rooms);
+    console.log("INCOMING ROOMS:", rooms.outerHTML);
 }
 
+
 function createdRoom(success){
-    console.log('successfully created room', success);
+    console.log('successfully created room', success.outerHTML);
     actions.roomCreated(success);
+    getRooms('muc.chat.thegeoffrey.co');
+}
+
+function getRooms(url){
+     getConnection().muc.listRooms(url, parseRooms, failureToGetRooms);
 }
 
 function failureToCreateRoom(failure){
@@ -38,11 +44,12 @@ function failureToGetRooms(failure){
 dispatcher.register(function(evt) {
     switch(evt.actionType){
         case "connected":
-        getConnection().muc.listRooms('chat.thegeoffrey.co', parseRooms, failureToGetRooms);
+        getRooms('muc.chat.thegeoffrey.co');
         break
 
         case "createRoom":
-        getConnection().muc.createConfiguredRoom(evt.payload, {"muc#roomconfig_publicroom": "1", "muc#roomconfig_persistentroom": "1"}, createdRoom, failureToCreateRoom);
+        var name = evt.payload;
+        console.log(getConnection().muc.createInstantRoom(name, createdRoom, failureToCreateRoom));
         break
 
         case "deleteRoom":

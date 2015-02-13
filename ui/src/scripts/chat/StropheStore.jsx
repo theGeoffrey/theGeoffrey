@@ -84,6 +84,9 @@ function init(service, server, username, session_id){
         password = session_id
     }
 
+    session_id = "33eb69bfc5954e08b99a40fa7b00f1b2@geoffrey-9cc5f29034b741a6babb29ffb47677d3";
+    jid = "anouk@community.thegeoffrey.co";
+
     console.log(jid, username, password, session_id);
 
     connection.connect(jid, session_id,
