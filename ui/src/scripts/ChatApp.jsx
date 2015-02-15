@@ -45,7 +45,6 @@ var ChatToggle = React.createClass({
 var Message = React.createClass({
   componentDidMount: function(){
     this.props.model.on("change", function(){
-      console.log("UPDATE");
       this.forceUpdate();
     }.bind(this));
   },
@@ -53,7 +52,7 @@ var Message = React.createClass({
     var model = this.props.model,
         cooked = model.getCooked(),
         id = model.id || model._cid,
-        style = model.isMine() ? {"text-align": "right"} : {},
+        style = model.isMine() ? {"textAlign": "right"} : {},
         cls = model.isMine() ? "msgIn" : "msgOut";
 
     return (<div
