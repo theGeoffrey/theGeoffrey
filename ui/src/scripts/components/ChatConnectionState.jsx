@@ -80,7 +80,18 @@ var IconStateButton = React.createClass({
 
         return (<Button bsStyle={bsStyle}><span className={classNames} title={title}></span></Button>);
     }
-})
+});
+
+var IconStateDot = React.createClass({
+    mixins: [ConnectionStateMixin],
+    getInitialState: defaultChatState,
+    render: function(){
+        var classNames = this.getChatIconState(),
+            bsStyle = this.getChatBsStyle();
+
+        return (<div className={bsStyle}/>);
+    }
+});
 
 var ConnectionProgress = React.createClass({
     mixins: [ConnectionStateMixin],
@@ -107,7 +118,8 @@ var ConnectionProgress = React.createClass({
 });
 
 
-module.exports = {IconStateLabel: IconStateLabel,
+module.exports = {IconStateLabel: IconStateLabel, 
+                  IconStateDot: IconStateDot,
                   IconStateButton: IconStateButton,
                   ConnectionStateMixin: ConnectionStateMixin,
                   ConnectionProgress: ConnectionProgress}

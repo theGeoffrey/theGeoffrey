@@ -38,37 +38,92 @@ body > .gfr {
       margin-left: 2px;
     }
 
-    .convTab {
+    .warning {
+      background-color: orange;
+      width: 16px;
+      height: 16px;
+      border-radius: 8px;
+      margin-top: 8px;
+      margin-left: 5px;
+    }
+
+    .danger {
+      background-color: red;
+      width: 16px;
+      height: 16px;
+      border-radius: 8px;
+      margin-top: 8px;
+      margin-left: 5px;
+    }
+
+    .success {
+      background-color: #a8ff00;
+      width: 16px;
+      height: 16px;
+      border-radius: 8px;
+      margin-top: 8px;
+      margin-left: 5px;
+    }
+
+    .info {
+       background-color: blue;
+      width: 16px;
+      height: 16px;
+      border-radius: 8px;
+      margin-top: 8px;
+      margin-left: 5px;
+    }
+
+    .convTabs{
+      background-color: #eeeeee;
+      margin-left: -50px;
+      margin-top: 34px;
       width: 50px;
-      height: 50px;
-      background-color: #C0C0C0;
-      color: white;
-      border-color: white;
-      border-width: 1.0px;
-      border-style: solid;
-      text-align: center;
-      line-height: 35px;
-    
-
-      .activeConv {
-       width: 10px;
-        height: 10px;
-        border-radius: 5px;
-        background-color: green;
-        padding-left: 5px;
-        
+      height: 100vh;
+      display: block;
+      float: left;
+      overflow: hidden;
+      
+      .plusTab {
+        width: 50px;
+        height: 50px;
+        background-color: #22cc66;
+        color: white;
+        font-weight: 400%;
+        font-size: 26px;
+        text-align: center;
+        line-height: 48px;
       }
 
-      .inactiveConv {
-        width: 10px;
-        height: 10px;
-        border-radius: 5px;
-        background-color: red;
-        padding-left: 5px;
+      .convTab {
+        width: 50px;
+        height: 50px;
+        background-color: purple;
+        color: white;
+        text-align: center;
+        line-height: 35px;
+      
 
+        .activeConv {
+         width: 10px;
+          height: 10px;
+          border-radius: 5px;
+          background-color: green;
+          padding-left: 5px;
+          
+        }
+
+        .inactiveConv {
+          width: 10px;
+          height: 10px;
+          border-radius: 5px;
+          background-color: red;
+          padding-left: 5px;
+
+        }
       }
+    }
     
-}
     .chat-window {
       form, .form-group {
         margin-bottom: 0;
@@ -76,20 +131,42 @@ body > .gfr {
       .input-group {
         width: 100%;
       }
+      .profileBlock{
+            position: absolute;
+            background: #222;
+            left: 0px;
+            right: 0px;
+            height: 34px;
+            color:white;
+        
+        .profileName{          
+            left: 30px;
+            color: white;
+            text-align: center;
+            width: 250px;
+            line-height: 35px;
+            top: 0px;
+            position: absolute;
+          }
+          .profileIcon {
+          }
+        }
+      
       .chatBox .messages img {
         max-width: 90%;
         display: block;
       }
       .chatBox {
-        height: 90vh;
+        height: 100vh;
         padding-left: 50px;
 
-        .convTabs{
-          margin-left: -50px;
-          width: 50px;
-          height: 90vh;
-          display: block;
-          float: left;
+        .selectConv {
+          position: absolute;
+          background-color: white;
+          text-align: center;
+          top: 50px;
+          left: 50px;
+          right: 0px;
         }
 
         .convWrap {
@@ -104,12 +181,8 @@ body > .gfr {
               overflow: hidden;
               display: flex;
               .messages {
-                width: 230px;
+                width: 250px;
                 overflow-y: scroll;
-
-                margin-right: 1vw;
-                margin-left: 1vw;
-
                 img {
                   display: inline-block;
                   max-width: 90%;
@@ -145,7 +218,7 @@ body > .gfr {
         .progress {
           position: absolute;
           top: 50%;
-          left: 10px;
+          left: 60px;
           right: 10px;
         }
       }
@@ -161,7 +234,7 @@ body > .gfr {
     .chat-window {
         position: fixed;
         z-index: 2002;
-        background-color: rgba(40.4%, 71%, 82%, 0.99);
+        background-color: white;
         overflow: hidden;
         -webkit-transition: all 0.3s;
         -moz-transition: all 0.3s;

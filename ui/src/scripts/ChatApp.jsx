@@ -13,6 +13,8 @@ var React = require('react/addons'),
     dispatcher = require('./chat/dispatcher'),
     chatStates = require('./components/ChatConnectionState'),
     IconStateButton = chatStates.IconStateButton,
+    IconStateLabel = chatStates.IconStateLabel,
+    IconStateDot = chatStates.IconStateDot,
     ConnectionProgress = chatStates.ConnectionProgress,
     queryString = require('query-string'),
     rtbs = require('react-bootstrap'),
@@ -149,7 +151,6 @@ var NewConv = React.createClass({
                   placeholder="username"
                   type="text"
                   ref="jid"
-                  buttonBefore={<IconStateButton />}
                   buttonAfter={<Button type="submit"><Glyphicon glyph="plus" /></Button>} />
             </form></div>)
   },
@@ -160,6 +161,21 @@ var NewConv = React.createClass({
     this.setState({jid: ''});
   }
 
+});
+
+var PlusButton = React.createClass({
+  onClick: function(evt){
+   this.props.onNew(!this.props.selectNew);
+   console.log('SELECT NEW? 1:', this.props.selectNew)
+  },
+
+  render: function() {
+    return (
+      <div onClick={this.onClick} className="plusTab">
+        <Glyphicon glyph="plus" />
+      </div>
+    );
+  }
 });
 
 var ConvTab = React.createClass({
@@ -187,9 +203,9 @@ var ConvTabs = React.createClass({
   render: function() {
     var conversations = this.props.conversations,
       selectedConv = this.props.selectedConv,
-      onSelect = this.props.onSelect;
+      onSelect = this.props.onSelect,
+      onNew = this.props.onNew;
 
-    console.log(conversations);
 
     var tabs = _.map(conversations, function(conv, idx){
                         var active = conv.id == selectedConv;
@@ -197,9 +213,23 @@ var ConvTabs = React.createClass({
                       }.bind(this));
     console.log(tabs);
     return (
-      <div className="convTabs">
+      <div className="convTabs"> 
         {tabs}
+        <PlusButton onNew={onNew} selectNew={this.props.selectNew}/>
       </div>      
+    );
+  }
+});
+
+var ProfileBlock = React.createClass({
+  render: function() {
+    return (
+      <div className="profileBlock">
+        <div className="profileIcon">
+          <IconStateDot className="profileIcon"/>
+        </div>
+        <div className="profileName">{this.props.nickname}</div>
+      </div>
     );
   }
 });
@@ -232,7 +262,7 @@ var ChatApp = React.createClass({
 
   getInitialState: function(){
     return {'loading': true, "jid": false,
-             open: true, selectedConv: null};
+             open: true, selectedConv: null, selectNew: false};
   },
 
   componentDidMount: function(){
@@ -248,29 +278,30 @@ var ChatApp = React.createClass({
   render: function() {
     var content = (<ConnectionProgress />),
         convs = conversationStore.models,
-        clsname = "chat " + (this.state.open ? "open" : "");
+        clsname = "chat " + (this.state.open ? "open" : ""),
+        nickname = this.state.loading ? 'loading' : this.state.jid.split('@')[0];
     if (!this.state.loading){
       if (conversationStore.length === 0 ){
-       content = (<div className="conversation"><p> Please start a conversation </p></div>);
+       content = (<div className="selectConv"><p> Please start a conversation </p><NewConv /></div>);
       } 
 
+      else if (this.state.selectNew){
+        content = (<div className="selectConv"><p> Please start a conversation </p><NewConv /></div>);
+      }
       else {
 
         var selectedConv = conversationStore.get(this.state.selectedConv),
         content = selectedConv ? (<Conversation
-                                    conversation={selectedConv} />) : (<p>please select a conversation</p>);
+                                    conversation={selectedConv} />) : (<p className="selectConv">please select a conversation</p>);
         
-        console.log(selectedConv, this.state.selectedConv);
       }
     }
 
-    // <NewConv />
-    // {convTabs}
-
     return (<div className={clsname}>
               <div className="chat-window">
+              <ProfileBlock nickname={nickname} />
                 <div className="chatBox">
-                  <ConvTabs conversations={convs} selectedConv={selectedConv} onSelect={this.handleSelectConv}/>
+                  <ConvTabs conversations={convs} selectedConv={selectedConv} onSelect={this.handleSelectConv} onNew={this.handlePlusPressed} selectNew={this.state.selectNew}/>
                   <div className="convWrap">
                     <SendMessage conversationId={this.state.selectedConv} />
                     {content}
@@ -282,8 +313,12 @@ var ChatApp = React.createClass({
 
   handleSelectConv: function(selectedKey){
     this.setState({selectedConv: selectedKey});
+     this.setState({selectNew: false});
+  },
+
+  handlePlusPressed: function(evt){
+   this.setState({selectNew: true});
   }
-  //<button onClick={this._toggleWindow} className='btn btn-primary'>close window</button>
 });
 
 module.exports = {
