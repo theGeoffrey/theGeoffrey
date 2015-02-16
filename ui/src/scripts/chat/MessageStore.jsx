@@ -14,12 +14,12 @@ var strph = require("strophe"),
 
 // We act with the ':tmp'-namespace, as implemented by mongooseim
 Strophe.addNamespace('MAM', 'urn:xmpp:mam:tmp');
-
+Strophe.addNamespace('RSM', 'http://jabber.org/protocol/rsm');
 
 
 //
 // Unfortunately the Discourse.Onebox INSISTS on acting on live-elements
-// that is very incomptabile with what we are doing here, so ... 
+// that is very incomptabile with what we are doing here, so ...
 //
 // ONCE MORE: OUR OWN IMPLEMENTATION, YEAH
 __onebox_url_cache = {}
@@ -82,12 +82,14 @@ function query_message_archive(connection) {
             actions.receiveMessage(msg);
         }, Strophe.NS.MAM, "message", null);
 
-
     // query whatever the MAM server condisers a good fallback amount...
     // <iq type='get'>
     //   <query xmlns='urn:xmpp:mam:tmp'>
+    //      <set xmlns="http//jabber.org/protocol/rsm">
     //       <before/>
+    //       <max>50</max>
     //       <simple />
+    //      </set>
     //   </query>
     // </iq>
     //
@@ -98,8 +100,10 @@ function query_message_archive(connection) {
 
     var query = $iq({type: "get"}
                  ).c("query", {xmlns: Strophe.NS.MAM}
-                    ).c('before').up(
-                    ).c('simple');
+                    ).c("set", {xmlns: Strophe.NS.RSM}
+                        ).c("before").up(
+                        ).c('simple').up(
+                        ).c("max").t(50);
     console.log(query.tree());
     connection.sendIQ(query, function(){
         console.log("successfully send IQ", arguments);
