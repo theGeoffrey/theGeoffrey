@@ -3,6 +3,7 @@
 var strph = require("strophe"), // becomes "window.Strophe"
     // mam = require("strophe-plugins/mam"), // Message Archive Management Protocol
     roster = require("strophe-plugins/roster"), // Roster Management
+    ping = require("strophe-plugins/ping"), // Ping-Pong Management
     actions = require("./actions"),
     moment = require("moment"),
     simple_register = require("./_helpers").simple_register,
@@ -15,6 +16,11 @@ var strph = require("strophe"), // becomes "window.Strophe"
 
 function log(){
   console.log && console.log(arguments);
+}
+
+function handlePing(ping){
+  connection.ping.pong(ping);
+  return true
 }
 
 function onMessage(msg) {
@@ -152,6 +158,7 @@ simple_register({
     connection.send($pres().tree());
     // query the roster, will query the archive
     query_roster(connection);
+    connection.ping.addPingHandler(handlePing);
   },
   "sendMessage": function(payload){
     var reply = $msg({to: payload.to.trim(), type: "chat"})
