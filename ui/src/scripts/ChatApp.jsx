@@ -5,28 +5,15 @@
 'use strict';
 
 var React = require('react/addons'),
-    stropheStore = require('./chat/StropheStore'),
-    initConnection = stropheStore.init,
-    whoami = stropheStore.whoami,
+    queryString = require('query-string'),
+    {Link} = require('react-router-component'),
+    {Button, DropdownButton, MenuItem, TabbedArea, TabPane, Input, Glyphicon} = require('react-bootstrap'),
     messageStore = require('./chat/MessageStore'),
     conversationStore = require('./chat/ConversationStore'),
     dispatcher = require('./chat/dispatcher'),
-    chatStates = require('./components/ChatConnectionState'),
-    IconStateButton = chatStates.IconStateButton,
-    IconStateLabel = chatStates.IconStateLabel,
-    IconStateDot = chatStates.IconStateDot,
-    ConnectionProgress = chatStates.ConnectionProgress,
-    queryString = require('query-string'),
-    rtbs = require('react-bootstrap'),
-    actions = require('./chat/actions'),
-    Button = rtbs.Button,
-    DropdownButton = rtbs.DropdownButton,
-    MenuItem = rtbs.MenuItem,
-    TabbedArea = rtbs.TabbedArea,
-    TabPane = rtbs.TabPane,
-    Input = rtbs.Input,
-    Glyphicon = rtbs.Glyphicon,
-    Link = require('react-router-component').Link;
+    initConnection = require('./chat/StropheStore').init,
+    {IconStateButton, IconStateLabel, IconStateDot, ConnectionProgress } = require('./components/ChatConnectionState'),
+    actions = require('./chat/actions');
 
 // Export React so the devtools can find it
 (window !== window.top ? window.top : window).React = React;
@@ -218,17 +205,19 @@ var ConvTabs = React.createClass({
       onSelect = this.props.onSelect,
       onNew = this.props.onNew;
 
-
     var tabs = _.map(conversations, function(conv, idx){
                         var active = conv.id == selectedConv;
-                        return (<ConvTab conversation={conv} active={active} onSelect={onSelect} />);
+                        return (<ConvTab
+                                    conversation={conv}
+                                    active={active}
+                                    onSelect={onSelect} />);
                       }.bind(this));
     console.log(tabs);
     return (
-      <div className="convTabs"> 
+      <div className="convTabs">
         {tabs}
         <PlusButton onNew={onNew} selectNew={this.props.selectNew}/>
-      </div>      
+      </div>
     );
   }
 });
@@ -295,17 +284,12 @@ var ChatApp = React.createClass({
     if (!this.state.loading){
       if (conversationStore.length === 0 ){
        content = (<div className="selectConv"><p> Please start a conversation </p><NewConv /></div>);
-      } 
-
-      else if (this.state.selectNew){
+      } else if (this.state.selectNew){
         content = (<div className="selectConv"><p> Please start a conversation </p><NewConv /></div>);
-      }
-      else {
-
+      } else {
         var selectedConv = conversationStore.get(this.state.selectedConv),
         content = selectedConv ? (<Conversation
                                     conversation={selectedConv} />) : (<p className="selectConv">please select a conversation</p>);
-        
       }
     }
 
