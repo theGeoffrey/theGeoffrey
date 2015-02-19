@@ -1,21 +1,63 @@
 
 var messages = require("./MessageStore"),
-    isMe = require("./StropheStore").isMe,
+    strph = require("strophe"),
+    stropheStore = require("./StropheStore"),
+    isMe = stropheStore.isMe,
+    StropheModel = stropheStore.StropheModel,
+    getConnection = stropheStore.getConnection,
+    parse_error_iq = require("./_helpers").parse_error_iq,
     _ = require("underscore"),
-    dispatcher = require("./dispatcher")
+    dispatcher = require("./dispatcher"),
+    Strophe = window.Strophe,
+    $iq = window.$iq,
     Backbone = require('backbone');
 
-var Conversation = Backbone.Model.extend({
+
+var Conversation = StropheModel.extend({
+    defaults: {
+        loading: false,
+        error: false,
+        isGroupChat: false,
+    },
     _filter: function(msg){
-        return msg && (msg.attributes.to === this.id || msg.attributes.from === this.id);
+        return msg && (msg.attributes.conversationId === this.id);
     },
     initialize: function(){
+        this.messages = new Backbone.Collection();
+
+        this.messages.once("add", function(msg){
+            this.set("isGroupChat", msg.get("isGroupChat"))
+        }.bind(this))
+
         messages.on("add", function(msg){
-            if (this._filter(msg)) this.trigger("change");
+            if (this._filter(msg)) {
+                this.messages.add(msg);
+                this.trigger("changed");
+            }
         }.bind(this));
+
+        this.messages.add(_.filter(messages.models, this._filter.bind(this)));
+        this.requeryInfo();
     },
+
+    requeryInfo: function(){
+        var model = this;
+        this.set("loading", true);
+        console.log(this.getConnection());
+        if (this.get("isGroupChat")){
+            this.getConnection().sendIQ(
+                $iq({type: "get", to: this.id}
+                    ).c("query", {"xmlns": "http://jabber.org/protocol/disco#info"})
+                , function(iq){
+                    console.log("ack", iq);
+                }, function(iq){
+                    model.set({"loading": false, "error": parse_error_iq(iq)});
+                });
+        }
+    },
+
     getMessages: function(){
-        return _.filter(messages.models, this._filter.bind(this));
+        return this.messages.models;
     }
 });
 
@@ -25,26 +67,26 @@ var ConversationCollection = Backbone.Collection.extend({
         var mdl = this.get(id);
         console.log(id);
         if (!mdl) {
-            return this.add({id: id})
+            return this.add({id: id});
         }
     },
 });
 
-var convsersations = new ConversationCollection();
+var conversations = new ConversationCollection();
 
 dispatcher.register(function(evt) {
     switch(evt.actionType){
         case 'startConversation':
-        convsersations.get_or_create(evt.payload);
-        break
+            conversations.get_or_create(evt.payload.conversationId);
+            break
         case 'sendMessage':
-        convsersations.get_or_create(evt.payload.to);
-        break;
+            conversations.get_or_create(evt.payload.conversationId);
+            break;
         case 'receiveMessage':
-        convsersations.get_or_create(isMe(evt.payload.from) ? evt.payload.to : evt.payload.from);
-        break;
+            conversations.get_or_create(evt.payload.conversationId);
+            break;
     }
 });
 
 
-module.exports = convsersations;
+module.exports = conversations;

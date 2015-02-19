@@ -129,7 +129,7 @@ getInitialState: function(){
     this.refs.message.value = ''
     if (msg){
       actions.sendMessage({"to": this.props.conversationId,
-                         "text": msg});
+                           "text": msg});
 
       this.setState({
         text: ''

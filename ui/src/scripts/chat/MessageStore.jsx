@@ -77,10 +77,10 @@ collection = new MessageCollection();
 
 
 function query_message_archive(connection) {
-    connection.addHandler(function(msg){
-            console.log(arguments);
-            actions.receiveMessage(msg);
-        }, Strophe.NS.MAM, "message", null);
+    // connection.addHandler(function(msg){
+    //         console.log(arguments);
+    //         actions.receiveMessage(msg);
+    //     }, Strophe.NS.MAM, "message", null);
 
     // query whatever the MAM server condisers a good fallback amount...
     // <iq type='get'>

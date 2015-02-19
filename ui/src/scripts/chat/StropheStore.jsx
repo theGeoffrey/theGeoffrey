@@ -1,13 +1,14 @@
 'use strict';
 
 var strph = require("strophe"), // becomes "window.Strophe"
-    // mam = require("strophe-plugins/mam"), // Message Archive Management Protocol
+    muc = require("strophe-plugins/muc"), // Install Multi-User-Chat
     roster = require("strophe-plugins/roster"), // Roster Management
     ping = require("strophe-plugins/ping"), // Ping-Pong Management
     actions = require("./actions"),
     moment = require("moment"),
     simple_register = require("./_helpers").simple_register,
     BOSH_SERVICE = 'ws://chat.thegeoffrey.co/ws-xmpp/',
+    Backbone = require('backbone'),
     connection = null,
     // wrapping strophe ....
     Strophe = window.Strophe,
@@ -20,14 +21,81 @@ function log(){
 
 function handlePing(ping){
   connection.ping.pong(ping);
-  return true
+  return true;
+}
+
+
+function whoami(){
+    return Strophe.getBareJidFromJid(connection.jid);
+}
+
+function isMe(compareJid){
+  return whoami() === Strophe.getBareJidFromJid(compareJid);
+}
+
+function getConnection(){
+  return connection;
+}
+
+var StropheModel = Backbone.Model.extend({
+  getConnection: getConnection,
+});
+
+
+
+
+function _parse_message(msg, frm){
+
+  var type = msg.getAttribute('type'),
+      body = msg.getElementsByTagName('body'),
+      thread = msg.getElementsByTagName('thread'),
+      archive = msg.getElementsByTagName('archived'),
+      from = frm || msg.getAttribute('from'),
+      payload = {
+        to: Strophe.getBareJidFromJid(msg.getAttribute('to')),
+        from: Strophe.getBareJidFromJid(from),
+        isGroupChat: false
+      };
+
+  if (!body.length) return;
+
+  payload['text'] = Strophe.getText(body[0]);
+  payload["timestamp"] = moment();
+
+  payload["conversationId"] = isMe(payload.from) ? payload.to : payload.from
+
+  if (thread.length){
+    payload["threadId"] = Strophe.getText(thread[0]);
+  }
+
+  if (type === "groupchat"){
+    payload["conversationId"] = payload["from"];
+    payload["from"] = Strophe.getResourceFromJid(from);
+    payload["isGroupChat"] = true;
+  }
+
+  if (archive.length){
+    // MAM: archive ID is given for us for later lookup
+    payload['id'] = archive[0].id;
+  }
+
+  return payload;
+}
+
+function onPresence(presence) {
+  var jid = presence.getAttribute('from'),
+      type = presence.getAttribute('type'),
+      show = (presence.getElementsByTagName('show').length !== 0) ? Strophe.getText(presence.getElementsByTagName('show')[0]) : null,
+      status =  (presence.getElementsByTagName('status').length !== 0) ? Strophe.getText(presence.getElementsByTagName('status')[0]) : null,
+      priority = (presence.getElementsByTagName('priority').length !== 0) ? Strophe.getText(presence.getElementsByTagName('priority')[0]) : null,
+      last = $('query[xmlns="jabber:iq:last"]', presence).length !==0 ? $('query[xmlns="jabber:iq:last"]', presence).attr('seconds') :  null;
 }
 
 function onMessage(msg) {
-    log(msg);
+    log("message", msg);
     var type = msg.getAttribute('type');
 
-    console.log(type);
+    console.log("type is", type, msg);
     if (type == null) {
       // MAM: we are an archive
       var result = msg.childNodes[0],
@@ -35,42 +103,19 @@ function onMessage(msg) {
           timestamp = delay.getAttribute("stamp"),
           from = delay.getAttribute("from"),
           message = msg.getElementsByTagName("message"),
-          payload = {from: Strophe.getBareJidFromJid(from),
-                     id: result.id, // our archive ID
-                     timestamp: moment(timestamp)};
+          payload = message.length ? _parse_message(message[0], from) : null;
 
-      if (!message.length) return;
+      if (!payload) return console.log("nope", message, payload);
 
-      message = message[0];
-      payload["to"] = Strophe.getBareJidFromJid(message.getAttribute("to"));
-      payload["text"] = Strophe.getText(message.childNodes[0]);
+      payload.id = result.id;
+      payload.timestamp = moment(timestamp);
 
       actions.receiveMessage(payload);
 
       console.log("archived message", payload);
 
-    } else if (type == "chat") {
-      var payload = {
-            to: Strophe.getBareJidFromJid(msg.getAttribute('to')),
-            from: Strophe.getBareJidFromJid(msg.getAttribute('from'))
-          },
-          body = msg.getElementsByTagName('body'),
-          archive = msg.getElementsByTagName('archived');
-
-      if (!body.length) return;
-
-      payload['text'] = Strophe.getText(body[0]);
-      payload["timestamp"] = moment();
-
-      if (archive.length){
-        // MAM: archive ID is given for us for later lookup
-        payload['id'] = archive[0].id;
-      }
-
-      actions.receiveMessage(payload);
-
-    } else if (type == "groupchat"){
-      // FIXME: not yet support
+    } else {
+      actions.receiveMessage(_parse_message(message));
     }
 
     // we must return true to keep the handler alive.
@@ -138,22 +183,10 @@ function query_roster(connection){
     });
 }
 
-function whoami(){
-    return Strophe.getBareJidFromJid(connection.jid);
-}
-
-function isMe(compareJid){
-  return whoami() === Strophe.getBareJidFromJid(compareJid);
-}
-
-function getConnection(){
-  return connection;
-}
-
-
 simple_register({
   "connected": function(evt){
     connection.addHandler(onMessage, null, "message", null, null,  null);
+    connection.addHandler(onPresence, null, "presence", null, null,  null);
     // set presence to there
     connection.send($pres().tree());
     // query the roster, will query the archive
@@ -161,7 +194,9 @@ simple_register({
     connection.ping.addPingHandler(handlePing);
   },
   "sendMessage": function(payload){
-    var reply = $msg({to: payload.to.trim(), type: "chat"})
+    var conversation = require("./ConversationStore").get(payload.to);
+    var type = conversation && conversation.get("isGroupChat") ? "groupchat" : "chat";
+    var reply = $msg({to: payload.to.trim(), type: type})
                     .cnode(Strophe.xmlElement('body', payload.text.trim()));
     connection.send(reply.tree());
   }
@@ -169,5 +204,6 @@ simple_register({
 
 module.exports = {init: init,
                   isMe: isMe,
+                  StropheModel: StropheModel,
                   whoami: whoami,
                   getConnection: getConnection};
