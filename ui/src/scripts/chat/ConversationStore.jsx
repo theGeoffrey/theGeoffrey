@@ -1,5 +1,6 @@
 
 var messages = require("./MessageStore"),
+    {users} = require("./UserStore"),
     strph = require("strophe"),
     _ = require("underscore"),
     dispatcher = require("./dispatcher"),
@@ -40,7 +41,7 @@ var Conversation = BaseModel.extend({
     requeryInfo: function(){
         var model = this;
         this.set("loading", true);
-        DEBUG && console.log(this.getConnection());
+        DEBUG && console.log(this);
         if (this.get("isGroupChat")){
             this.getConnection().sendIQ(
                 $iq({type: "get", to: this.id}
@@ -50,6 +51,9 @@ var Conversation = BaseModel.extend({
                 }, function(iq){
                     model.set({"loading": false, "error": parse_error_iq(iq)});
                 });
+        } else {
+            DEBUG && console.log("fetching user", this.id);
+            this.set("user", users.get_or_create(this.id));
         }
     },
 

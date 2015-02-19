@@ -90,13 +90,6 @@ var Conversation = React.createClass({
   }
 });
 
-var ConversationTitle = React.createClass({
-  render: function() {
-    var name = this.props.conversation.id[0];
-    return (<span>{name}</span>);
-  }
-});
-
 var SendMessage = React.createClass({
 getInitialState: function(){
     return {text: ''};
@@ -180,17 +173,36 @@ var PlusButton = React.createClass({
 
 var ConvTab = React.createClass({
 
+  componentDidMount: function(){
+    var conv = this.props.conversation;
+    conv.on("all", function(){
+      this.forceUpdate();
+    }.bind(this))
+    if (conv.get("user")){
+      conv.get("user").on("all", function(){
+        this.forceUpdate();
+      }.bind(this))
+    }
+  },
+
   onClick: function(evt){
     this.props.onSelect(this.props.conversation.id);
   },
 
   render: function() {
-    var conversation = this.props.conversation;
-    var state = this.props.active ? "activeConv" : "inactiveConv";
-    
+    var conversation = this.props.conversation,
+        state = this.props.active ? "activeConv" : "inactiveConv",
+        user = conversation.get("user"),
+        title = (<span title={conversation.id}>{conversation.id[0]}</span>);
+
+    if (user && !user.get("loading")){
+      var profilePictureUrl = user.getProfilePictureURL();
+      title = (<img src={profilePictureUrl} title={user.get("name") || user.get("username")}/>);
+    }
+
     return (
       <div onClick={this.onClick} className="convTab">
-        <ConversationTitle conversation={conversation} />
+        {title}
         <div className={state} />
       </div>
 
