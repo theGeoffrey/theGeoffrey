@@ -21,7 +21,7 @@ var EmbedApp = React.createClass({
                                        settings={me.props.settings}
                                        config={me.props.config} />)
                 });
-        console.log(components);
+        DEBUG && console.log(components);
         return <div>{components}</div>;
     }
 });
@@ -52,7 +52,7 @@ var EmbedApp = React.createClass({
         React.render(<EmbedApp user={user} config={config} settings={settings} />,
                       document.getElementById('geoffrey-base-div')); // jshint ignore:line
 
-        if (console && console.log){
+        if (DEBUG && console && console.log){
             console.log(config, Discourse.SiteSettings, Discourse.User.current());
             console.log("Geoffrey embedded successfully.");
         }

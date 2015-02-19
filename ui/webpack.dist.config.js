@@ -17,7 +17,7 @@ module.exports = {
   },
 
   debug: false,
-  devtool: false,
+  devtool: "source-map",
   entry: {'app': [
               '!bootstrap-webpack!./bootstrap.config.js',
               'font-awesome-webpack!./font-awesome.config.js',

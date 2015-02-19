@@ -1,9 +1,6 @@
 
 var strph = require("strophe"),
-    stropheStore = require("./StropheStore"),
-    simple_register = require("./_helpers").simple_register,
-    whoami = stropheStore.whoami,
-    getConnection = stropheStore.getConnection,
+    {simple_register, whoami, getConnection} = require("./_helpers"),
     Strophe = window.Strophe,
     Backbone = require('backbone');
 
@@ -104,9 +101,9 @@ function query_message_archive(connection) {
                         ).c("before").up(
                         ).c('simple').up(
                         ).c("max").t(50);
-    console.log(query.tree());
+    DEBUG && console.log(query.tree());
     connection.sendIQ(query, function(){
-        console.log("successfully send IQ", arguments);
+        DEBUG & console.log("successfully send IQ", arguments);
     });
 }
 

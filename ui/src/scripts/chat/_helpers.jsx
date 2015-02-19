@@ -5,7 +5,7 @@ var dispatcher = require("./dispatcher"),
 
 function simple_register(callbacks){
     dispatcher.register(function(evt) {
-        console.log(evt, callbacks);
+        DEBUG && console.log(evt, callbacks);
         var actionType = evt.actionType;
         if (!actionType) return;
         if (callbacks.hasOwnProperty(actionType)){
@@ -16,6 +16,28 @@ function simple_register(callbacks){
             }
         }
     });
+}
+
+
+
+function getConnection(){
+  return require("./StropheStore").getConnection();
+}
+
+function myServer(){
+  return Strophe.getDomainFromJid(getConnection().jid);
+}
+
+function whoami(){
+    return Strophe.getBareJidFromJid(getConnection().jid);
+}
+
+function isMe(compareJid){
+  return whoami() === Strophe.getBareJidFromJid(compareJid);
+}
+
+function isFromMyCommunity(compareJid){
+  return myServer() === Strophe.getDomainFromJid(compareJid);
 }
 
 function parse_error_iq(iq){
@@ -34,8 +56,12 @@ function parse_error_iq(iq){
   }
 }
 
-
 module.exports = {
     simple_register: simple_register,
-    parse_error_iq: parse_error_iq
+    parse_error_iq: parse_error_iq,
+    isMe: isMe,
+    whoami: whoami,
+    isFromMyCommunity: isFromMyCommunity,
+    getConnection: getConnection,
+    myServer: myServer,
   }

@@ -6,7 +6,7 @@ var strph = require("strophe"), // becomes "window.Strophe"
     ping = require("strophe-plugins/ping"), // Ping-Pong Management
     actions = require("./actions"),
     moment = require("moment"),
-    simple_register = require("./_helpers").simple_register,
+    { simple_register, isMe } =  require("./_helpers"),
     BOSH_SERVICE = 'ws://chat.thegeoffrey.co/ws-xmpp/',
     Backbone = require('backbone'),
     connection = null,
@@ -15,8 +15,15 @@ var strph = require("strophe"), // becomes "window.Strophe"
     $msg = window.$msg,
     $pres = window.$pres;
 
-function log(){
-  console.log && console.log(arguments);
+
+if(DEBUG){
+  Strophe.log = function (level, msg) {
+    if (level == Strophe.LogLevel.ERROR || level ==Strophe.LogLevel.FATAl){
+        console.error("STROPHE ERROR:", msg);
+    } else {
+      console.log("STROPHE", msg);
+    }
+  }
 }
 
 function handlePing(ping){
@@ -24,25 +31,9 @@ function handlePing(ping){
   return true;
 }
 
-
-function whoami(){
-    return Strophe.getBareJidFromJid(connection.jid);
-}
-
-function isMe(compareJid){
-  return whoami() === Strophe.getBareJidFromJid(compareJid);
-}
-
 function getConnection(){
   return connection;
 }
-
-var StropheModel = Backbone.Model.extend({
-  getConnection: getConnection,
-});
-
-
-
 
 function _parse_message(msg, frm){
 
@@ -92,10 +83,10 @@ function onPresence(presence) {
 }
 
 function onMessage(msg) {
-    log("message", msg);
+    DEBUG && console.log("message", msg);
     var type = msg.getAttribute('type');
 
-    console.log("type is", type, msg);
+    DEBUG && console.log("type is", type, msg);
     if (type == null) {
       // MAM: we are an archive
       var result = msg.childNodes[0],
@@ -112,7 +103,7 @@ function onMessage(msg) {
 
       actions.receiveMessage(payload);
 
-      console.log("archived message", payload);
+      DEBUG && console.log("archived message", payload);
 
     } else {
       actions.receiveMessage(_parse_message(message));
@@ -135,50 +126,50 @@ function init(service, server, username, session_id){
         password = session_id
     }
 
-    console.log(jid, username, password, session_id);
+    DEBUG && console.log(jid, username, password, session_id);
 
     connection.connect(jid, session_id,
         function onConnect(status, reason) {
 
         if (status == Strophe.Status.CONNECTING) {
-           log('Strophe is connecting.');
+           DEBUG && console.log('Strophe is connecting.');
            actions.connecting();
 
         } else if (status == Strophe.Status.AUTHENTICATING) {
-           log('Strophe authenticating...', arguments);
+           DEBUG && console.log('Strophe authenticating...', arguments);
            actions.authenticating();
 
         } else if (status == Strophe.Status.ATTACHED) {
-           log('Strophe attached...', arguments);
+           DEBUG && console.log('Strophe attached...', arguments);
            actions.attached({reason: reason});
 
         } else if (status == Strophe.Status.AUTHFAIL) {
-           log('Strophe authenticating... failed', arguments);
+           DEBUG && console.log('Strophe authenticating... failed', arguments);
            actions.authFailed({reason: reason});
 
         } else if (status == Strophe.Status.CONNFAIL) {
-           log('Strophe failed to connect.', arguments);
+           DEBUG && console.log('Strophe failed to connect.', arguments);
            actions.connFailed({reason: reason});
 
         } else if (status == Strophe.Status.DISCONNECTING) {
-           log('Strophe is disconnecting.');
+           DEBUG && console.log('Strophe is disconnecting.');
            actions.disconnecting();
 
         } else if (status == Strophe.Status.DISCONNECTED) {
-           log('Strophe is disconnected.');
+           DEBUG && console.log('Strophe is disconnected.');
            actions.disconnected();
 
         } else if (status == Strophe.Status.CONNECTED) {
-           log('Strophe is connected.');
+           DEBUG && console.log('Strophe is connected.');
            actions.connected({jid: connection.jid});
+           window.STROPHE_CONNECTION = connection;
         }
     });
 };
 
-
 function query_roster(connection){
     connection.roster.get(function(){
-        console.log("roster received", arguments, connection.roster.items);
+        DEBUG && console.log("roster received", arguments, connection.roster.items);
         actions.rosterChanged(connection.roster.items);
     });
 }
@@ -203,7 +194,4 @@ simple_register({
 });
 
 module.exports = {init: init,
-                  isMe: isMe,
-                  StropheModel: StropheModel,
-                  whoami: whoami,
                   getConnection: getConnection};

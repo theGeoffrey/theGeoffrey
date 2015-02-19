@@ -1,19 +1,16 @@
 
 var messages = require("./MessageStore"),
     strph = require("strophe"),
-    stropheStore = require("./StropheStore"),
-    isMe = stropheStore.isMe,
-    StropheModel = stropheStore.StropheModel,
-    getConnection = stropheStore.getConnection,
-    parse_error_iq = require("./_helpers").parse_error_iq,
     _ = require("underscore"),
     dispatcher = require("./dispatcher"),
+    Backbone = require('backbone'),
+    {isMe,  getxConnection, parse_error_iq} = require("./_helpers"),
+    {BaseModel, BaseCollection} = require("./_mixins"),
     Strophe = window.Strophe,
-    $iq = window.$iq,
-    Backbone = require('backbone');
+    $iq = window.$iq;
 
 
-var Conversation = StropheModel.extend({
+var Conversation = BaseModel.extend({
     defaults: {
         loading: false,
         error: false,
@@ -43,13 +40,13 @@ var Conversation = StropheModel.extend({
     requeryInfo: function(){
         var model = this;
         this.set("loading", true);
-        console.log(this.getConnection());
+        DEBUG && console.log(this.getConnection());
         if (this.get("isGroupChat")){
             this.getConnection().sendIQ(
                 $iq({type: "get", to: this.id}
                     ).c("query", {"xmlns": "http://jabber.org/protocol/disco#info"})
                 , function(iq){
-                    console.log("ack", iq);
+                    DEGUG && console.log("ack", iq);
                 }, function(iq){
                     model.set({"loading": false, "error": parse_error_iq(iq)});
                 });
@@ -61,15 +58,8 @@ var Conversation = StropheModel.extend({
     }
 });
 
-var ConversationCollection = Backbone.Collection.extend({
-    model: Conversation,
-    get_or_create: function(id){
-        var mdl = this.get(id);
-        console.log(id);
-        if (!mdl) {
-            return this.add({id: id});
-        }
-    },
+var ConversationCollection = BaseCollection.extend({
+    model: Conversation
 });
 
 var conversations = new ConversationCollection();

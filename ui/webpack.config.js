@@ -16,8 +16,9 @@ module.exports = {
   },
 
   cache: false,
-  // debug: true,
-  devtool: true,
+  console: false,
+  devtool: "#eval",
+  debug: true,
   entry: {'app': [
               'webpack/hot/only-dev-server',
               '!bootstrap-webpack!./bootstrap.config.js',
