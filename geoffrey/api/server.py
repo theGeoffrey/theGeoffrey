@@ -10,11 +10,14 @@ from klein import Klein
 
 from geoffrey import __version__
 from geoffrey.config import CONFIG
+from geoffrey.plugins import manager as plugins_manager
 from geoffrey.helpers import get_database_connection, get_request_param
 from geoffrey.utils import (get_active_services_for_api, db_now,
                             db_date_format, db_date_parse)
 from geoffrey import tasks
-from urlparse import urlparse
+
+# Not used but sets up other things for us. Don't remove!
+from geoffrey.services import __all__ as services
 
 import json
 
@@ -123,18 +126,18 @@ class GeoffreyApi(Klein):
             self._api_trigger_wrapper("{}_schedule".format(item)))
 
     def get_server_settings(self, request):
-        domain = ""
-        if hasattr(request, "config"):
-            domain = urlparse(request.config['dc_url']).hostname
-
+        config = getattr(request, "config", {})
         settings = {"capabilities": {},
-                    "chat_domain": domain,
                     "COUCH": {
                         "DOMAIN": CONFIG.COUCHDB_DOMAIN,
                         "PROTO": CONFIG.get('COUCH_PROTO') or 'http'},
                     "version": __version__,
                     }
-        return settings
+        return plugins_manager.run("generate_server_settings",
+                                   settings,
+                                   request,
+                                   config
+                                   ).addCallback(lambda x: settings)
 
 
 app = GeoffreyApi()
@@ -188,16 +191,19 @@ def create_session(request):
 @app.public
 @app.with_session
 def confirm_session_pair(request, **kwargs):
-    server_config = app.get_server_settings(request)
-    for key, value in request.args.iteritems():
-        value = value[0]
-        if request.session.get(key, None) != value and \
-                server_config.get(key, None) != value:
-            break
-    else:
-        # none broke, we are good to return true
-        return "true"
-    return "false"
+    def _check_session(server_config):
+        for key, value in request.args.iteritems():
+            value = value[0]
+            if request.session.get(key, None) != value and \
+                    server_config.get(key, None) != value:
+                break
+        else:
+            # none broke, we are good to return true
+            return "true"
+        return "false"
+
+    return app.get_server_settings(request
+                                   ).addCallback(_check_session)
 
 
 @app.route('/forms/add', methods=['POST'])
@@ -213,9 +219,8 @@ def add_form(request):
 @app.public
 def embed_config(request):
     json_p = request.args.get('json_p', [None])[0] or "__startGeoffrey"
-    # FIXME: ask the apps what to send...
-    settings = app.get_server_settings(request)
-    return "{}({});".format(json_p, json.dumps(settings))
+    return app.get_server_settings(request
+            ).addCallback(lambda s: "{}({});".format(json_p, json.dumps(s)))
 
 
 @app.route('/ping')

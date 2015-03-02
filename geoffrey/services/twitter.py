@@ -52,7 +52,7 @@ class TwitterClient(object):
                              resource_owner_secret=self._token_secret,
                              encoding='utf-8',
                              decoding='utf-8')
-   
+
     def _request(self, http_method, url, payload=None):
         def _raise_error(txt):
             logger.info("ERROR: %s", txt)
@@ -103,10 +103,10 @@ class TwitterClient(object):
             #Get the tweet, sender username, sender link, date per tweet
             return mentions
 
-        #TODO: only include non-empty params
+        # TODO: only include non-empty params
         params = [count, since_id]
 
-        count = 'count={}'.format(count) 
+        count = 'count={}'.format(count)
         since_id = 'since_id={}'.format(since_id)
         params.append(count, since_id)
 
