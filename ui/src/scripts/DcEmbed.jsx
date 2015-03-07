@@ -6,7 +6,7 @@
 
 var React = require('react/addons'),
     _ = require("underscore"),
-    Chat = require('./ChatApp');
+    Chat = require('./chat/ChatApp');
 
 var apps = [Chat];
 

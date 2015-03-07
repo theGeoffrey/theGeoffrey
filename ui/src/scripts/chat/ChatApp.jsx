@@ -8,18 +8,18 @@ var React = require('react/addons'),
     queryString = require('query-string'),
     {Link} = require('react-router-component'),
     {Button, DropdownButton, MenuItem, TabbedArea, TabPane, Input, Glyphicon} = require('react-bootstrap'),
-    messageStore = require('./chat/MessageStore'),
-    conversationStore = require('./chat/ConversationStore'),
-    dispatcher = require('./chat/dispatcher'),
-    initConnection = require('./chat/StropheStore').init,
-    {IconStateButton, IconStateLabel, IconStateDot, ConnectionProgress } = require('./components/ChatConnectionState'),
-    actions = require('./chat/actions');
+    messageStore = require('./MessageStore'),
+    conversationStore = require('./ConversationStore'),
+    dispatcher = require('./dispatcher'),
+    initConnection = require('./StropheStore').init,
+    {IconStateButton, IconStateLabel, IconStateDot, ConnectionProgress } = require('../components/ChatConnectionState'),
+    actions = require('./actions');
 
 // Export React so the devtools can find it
 (window !== window.top ? window.top : window).React = React;
 
 // CSS
-require('../styles/chat.less');
+require('../../styles/chat.less');
 
 var ChatToggle = React.createClass({
   render: function(){
@@ -249,7 +249,7 @@ var ChatApp = React.createClass({
     React.render(<ChatToggle toggle={this._toggleWindow} />,
         document.getElementById('gfr-chat-toggle'));
 
-    var chat_domain = this.props.config.chat_domain,
+    var chat_domain = this.props.config.chat.domain,
         public_key = this.props.settings.geoffrey_public_key;
     if (this.props.user){
       var username = this.props.user.username.toLowerCase();
@@ -262,8 +262,11 @@ var ChatApp = React.createClass({
   },
 
   getInitialState: function(){
-    return {'loading': true, "jid": false,
-             open: true, selectedConv: null, selectNew: false};
+    return {'loading': true,
+            "jid": false,
+             open: this.props.config.chat.default_open,
+             selectedConv: null,
+             selectNew: false};
   },
 
   componentDidMount: function(){
@@ -319,8 +322,35 @@ var ChatApp = React.createClass({
 
 module.exports = {
   shouldBeLoaded: function(){
-    console.log(this);
+    console.log(this, this.props.config.chat);
+    var chatconfig = this.props.config.chat,
+        user = this.props.user;
+
+    if (!chatconfig || !chatconfig.domain) {
+      // chat is deactivated
+      return false;
+    }
+
+    if (!user){
+      return chatconfig.allow_guests;
+    }
+
+    if (chatconfig.limit_to_group) {
+      var group_name = chatconfig.limit_to_group;
+      // this works for 'admin', 'staff' and 'moderator'
+      if (user.get(group_name)) return true;
+      var trust_level_match = group_name.match(/trust_level_([\d])/);
+      if (trust_level_match){
+        if (user.get("admin")) return true; //Admins are all trust levels
+        var trust_level = parseInt(trust_level[1]);
+        return user.get("trust_level") >= trust_level;
+      }
+
+      return user.get("custom_groups").indexOf(group_name) > -1;
+    }
+
     return true;
+
   },
   component: ChatApp
 }
